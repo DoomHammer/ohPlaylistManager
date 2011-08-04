@@ -1,49 +1,76 @@
 #ifndef HEADER_PLAYLISTMANAGER
 #define HEADER_PLAYLISTMANAGER
 
-#include <OpenHome/OhNetTypes.h>
 #include <OpenHome/Buffer.h>
 #include <OpenHome/Net/Core/DvDevice.h>
-#include <OpenHome/Private/Thread.h>
-#include <OpenHome/Private/Timer.h>
-#include <OpenHome/Private/Http.h>
-
-#include "Ohm.h"
 
 namespace OpenHome {
 namespace Net {
+	class ProviderPlaylistManager;
+}
+}
 
-class ProviderPlaylistManager;
+namespace OpenHome {
+namespace Media {
+	
+class Playlist;
 
 class IPlaylistManagerPersist
 {
 public:
-    virtual TUint PlaylistCount() = 0;
-    virtual TUint MaxTrackCount() = 0;
-    virtual TUint MaxPlaylistCount() = 0;
+	virtual ~IPlaylistManagerPersist() {}
+	
+    virtual TUint PlaylistCount() const = 0;
+    virtual TUint MaxTrackCount() const = 0;
+    virtual TUint MaxPlaylistCount() const = 0;
     virtual void Save(const Playlist& aPlaylist) = 0;
     virtual void Delete(const Playlist& aPlaylist) = 0;
-    virtual ~IPlaylistManagerPersist() {}
+};
+	
+class PlaylistManagerPersistFs : public IPlaylistManagerPersist
+{
+public:
+	PlaylistManagerPersistFs();
+	~PlaylistManagerPersistFs() {}
+	
+	TUint PlaylistCount() const;
+    TUint MaxTrackCount() const;
+    TUint MaxPlaylistCount() const;
+    void Save(const Playlist& aPlaylist);
+    void Delete(const Playlist& aPlaylist);
 };
 
-class PlaylistManager
+class INameable
+{
+public:
+	virtual ~INameable() {}
+	
+	virtual void SetName(const Brx& aValue) = 0;
+};
+
+class PlaylistManager : public INameable
 {
 public:
 	static const TUint kMaxNameBytes = 30;
+	static const TUint kMaxImageBytes = 30 * 1024;
+	static const TUint kMaxMimeTypeBytes = 100;
 
 public:
-    PlaylistManager(DvDevice& aDevice, IPlaylistManagerPersist& aPersist, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
+    PlaylistManager(OpenHome::Net::DvDevice& aDevice, IPlaylistManagerPersist& aPersist, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
+	~PlaylistManager();
+	
 	void SetName(const Brx& aValue);
-    ~PlaylistManager();
-
+	void SetAdapter(const TIpAddress& aAdapter);
 private:
-    DvDevice& iDevice;
+	OpenHome::Net::DvDevice& iDevice;
     IPlaylistManagerPersist& iPersist;
     Bws<kMaxNameBytes> iName;
-    ProviderPlaylistManager* iProvider;
+	Bws<kMaxImageBytes> iImage;
+	Bws<kMaxMimeTypeBytes> iMimeType;
+	OpenHome::Net::ProviderPlaylistManager* iProvider;
 };
 
-class PlaylistManagerSession : public SocketTcpSession
+/*class PlaylistManagerSession : public SocketTcpSession
 {
     static const TUint kMaxRequestBytes = 4*1024;
     static const TUint kMaxResponseBytes = 4*1024;
@@ -66,10 +93,10 @@ private:
     TBool iResponseStarted;
     TBool iResponseEnded;
     Semaphore iSemaphore;
-};
+};*/
 
 
-} // namespace Net
+} // namespace Media
 } // namespace OpenHome
 
 #endif // HEADER_PLAYLISTMANAGER

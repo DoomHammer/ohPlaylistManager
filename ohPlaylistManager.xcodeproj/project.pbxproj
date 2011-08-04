@@ -1,0 +1,246 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		6508E7DB13E973020058AB11 /* PlaylistManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6508E7D813E973020058AB11 /* PlaylistManager.cpp */; };
+		6508E7DC13E973020058AB11 /* ohPlaylistManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */; };
+		65C6E38A13EAAD400005E0A8 /* libohNetDevices.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65C6E38913EAAD400005E0A8 /* libohNetDevices.a */; };
+		65E10B2013E9926F00F3E45D /* libohNetCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65E10B1F13E9926F00F3E45D /* libohNetCore.a */; };
+		65E10C2713E9A19000F3E45D /* libTestFramework.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65E10C2613E9A19000F3E45D /* libTestFramework.a */; };
+		8DD76F6A0486A84900D96B5E /* ohPlaylistManager.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6859E8B029090EE04C91782 /* ohPlaylistManager.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		8DD76F690486A84900D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76F6A0486A84900D96B5E /* ohPlaylistManager.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		6508E7D813E973020058AB11 /* PlaylistManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaylistManager.cpp; sourceTree = "<group>"; };
+		6508E7D913E973020058AB11 /* PlaylistManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistManager.h; sourceTree = "<group>"; };
+		6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ohPlaylistManager.cpp; sourceTree = "<group>"; };
+		65C6E38913EAAD400005E0A8 /* libohNetDevices.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libohNetDevices.a; path = /Users/davidd/work/openhome/ohNet/Build/Obj/Mac/Debug/libohNetDevices.a; sourceTree = "<absolute>"; };
+		65C6E44E13EAC3EC0005E0A8 /* Icon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Icon.h; sourceTree = "<group>"; };
+		65E10B1F13E9926F00F3E45D /* libohNetCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libohNetCore.a; path = /Users/davidd/work/openhome/ohNet/Build/Obj/Mac/Debug/libohNetCore.a; sourceTree = "<absolute>"; };
+		65E10C2613E9A19000F3E45D /* libTestFramework.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libTestFramework.a; path = /Users/davidd/work/openhome/ohNet/Build/Obj/Mac/Debug/libTestFramework.a; sourceTree = "<absolute>"; };
+		8DD76F6C0486A84900D96B5E /* ohPlaylistManager */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = ohPlaylistManager; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6859E8B029090EE04C91782 /* ohPlaylistManager.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = ohPlaylistManager.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8DD76F660486A84900D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				65E10B2013E9926F00F3E45D /* libohNetCore.a in Frameworks */,
+				65E10C2713E9A19000F3E45D /* libTestFramework.a in Frameworks */,
+				65C6E38A13EAAD400005E0A8 /* libohNetDevices.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* ohPlaylistManager */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6859E8C029090F304C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = ohPlaylistManager;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				6508E7D813E973020058AB11 /* PlaylistManager.cpp */,
+				6508E7D913E973020058AB11 /* PlaylistManager.h */,
+				6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */,
+				65E10B1F13E9926F00F3E45D /* libohNetCore.a */,
+				65E10C2613E9A19000F3E45D /* libTestFramework.a */,
+				65C6E38913EAAD400005E0A8 /* libohNetDevices.a */,
+				65C6E44E13EAC3EC0005E0A8 /* Icon.h */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76F6C0486A84900D96B5E /* ohPlaylistManager */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6859E8C029090F304C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6859E8B029090EE04C91782 /* ohPlaylistManager.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8DD76F620486A84900D96B5E /* ohPlaylistManager */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "ohPlaylistManager" */;
+			buildPhases = (
+				8DD76F640486A84900D96B5E /* Sources */,
+				8DD76F660486A84900D96B5E /* Frameworks */,
+				8DD76F690486A84900D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ohPlaylistManager;
+			productInstallPath = "$(HOME)/bin";
+			productName = ohPlaylistManager;
+			productReference = 8DD76F6C0486A84900D96B5E /* ohPlaylistManager */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "ohPlaylistManager" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* ohPlaylistManager */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76F620486A84900D96B5E /* ohPlaylistManager */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8DD76F640486A84900D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6508E7DB13E973020058AB11 /* PlaylistManager.cpp in Sources */,
+				6508E7DC13E973020058AB11 /* ohPlaylistManager.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		1DEB923208733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../ohNet/Build/Obj/Mac/Debug\"",
+				);
+				PRODUCT_NAME = ohPlaylistManager;
+			};
+			name = Debug;
+		};
+		1DEB923308733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_MODEL_TUNING = G5;
+				INSTALL_PATH = /usr/local/bin;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/../ohNet/Build/Obj/Mac/Debug\"",
+				);
+				PRODUCT_NAME = ohPlaylistManager;
+			};
+			name = Release;
+		};
+		1DEB923608733DC60010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../ohNet/Build/Include;
+				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = "-fvisibility=hidden";
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Debug;
+		};
+		1DEB923708733DC60010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = ../ohNet/Build/Include;
+				OTHER_CFLAGS = "-fvisibility=hidden";
+				PREBINDING = NO;
+				SDKROOT = macosx10.6;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		1DEB923108733DC60010E9CD /* Build configuration list for PBXNativeTarget "ohPlaylistManager" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923208733DC60010E9CD /* Debug */,
+				1DEB923308733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "ohPlaylistManager" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB923608733DC60010E9CD /* Debug */,
+				1DEB923708733DC60010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
