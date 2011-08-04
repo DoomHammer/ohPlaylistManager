@@ -41,7 +41,7 @@ namespace Net {
 		virtual void DeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId, TUint aValue);
 		virtual void DeleteAll(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId);
 		
-		void SetMetadata();
+		virtual void SetMetadata();
 		
 		IPlaylistManagerPersist& iPersist;
 		Bws<kMaxNameBytes> iName;
@@ -82,8 +82,8 @@ ProviderPlaylistManager::ProviderPlaylistManager(DvDevice& aDevice, IPlaylistMan
 	SetPropertyImagesXml(Brx::Empty());
 	SetPropertyIdArray(Brx::Empty());
 	SetPropertyTokenArray(Brx::Empty());
-	SetPropertyPlaylistsMax(-1);
-	SetPropertyTracksMax(-1);
+	SetPropertyPlaylistsMax(aPersist.MaxPlaylistCount());
+	SetPropertyTracksMax(aPersist.MaxTrackCount());
 }
 
 void ProviderPlaylistManager::SetName(const Brx& aValue)

@@ -31,13 +31,13 @@ class PlaylistManagerPersistFs : public IPlaylistManagerPersist
 {
 public:
 	PlaylistManagerPersistFs();
-	~PlaylistManagerPersistFs() {}
+	virtual ~PlaylistManagerPersistFs() {}
 	
-	TUint PlaylistCount() const;
-    TUint MaxTrackCount() const;
-    TUint MaxPlaylistCount() const;
-    void Save(const Playlist& aPlaylist);
-    void Delete(const Playlist& aPlaylist);
+	virtual TUint PlaylistCount() const;
+    virtual TUint MaxTrackCount() const;
+    virtual TUint MaxPlaylistCount() const;
+    virtual void Save(const Playlist& aPlaylist);
+    virtual void Delete(const Playlist& aPlaylist);
 };
 
 class INameable
@@ -57,9 +57,10 @@ public:
 
 public:
     PlaylistManager(OpenHome::Net::DvDevice& aDevice, IPlaylistManagerPersist& aPersist, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
-	~PlaylistManager();
+	virtual ~PlaylistManager();
 	
-	void SetName(const Brx& aValue);
+	virtual void SetName(const Brx& aValue);
+	
 	void SetAdapter(const TIpAddress& aAdapter);
 private:
 	OpenHome::Net::DvDevice& iDevice;
