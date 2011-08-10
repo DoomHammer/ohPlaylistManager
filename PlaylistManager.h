@@ -4,7 +4,10 @@
 #include <list>
 
 #include <OpenHome/Buffer.h>
+#include <OpenHome/Private/Thread.h>
 #include <OpenHome/Net/Core/DvDevice.h>
+
+EXCEPTION(PlaylistManagerError);
 
 namespace OpenHome {
 namespace Net {
@@ -15,9 +18,17 @@ namespace Net {
 namespace OpenHome {
 namespace Media {
 	
-class Playlist;
-
+class IdGenerator
+{
+public:
+	IdGenerator();
 	
+	TUint NewId();
+	
+private:
+	TUint iNextId;
+};
+		
 class PlaylistHeader
 {
 public:
@@ -28,18 +39,22 @@ public:
 	PlaylistHeader(const TUint aId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
 	
 	TUint Id() const;
-	bool IsId(TUint aId) const;
+	bool IsId(const TUint aId) const;
+	
+	TUint Token() const;
+	void Modified();
 	
 	const Brx& Name() const;
 	const Brx& Description() const;
 	TUint ImageId() const;
 	
 private:
-	TUint iId;
+	const TUint iId;
+	TUint iToken;
 	
-	Bws<kMaxNameBytes> iName;
-	Bws<kMaxDescriptionBytes> iDescription;
-	TUint iImageId;
+	const Bws<kMaxNameBytes> iName;
+	const Bws<kMaxDescriptionBytes> iDescription;
+	const TUint iImageId;
 };
 
 class INameable
@@ -50,14 +65,64 @@ public:
 	virtual void SetName(const Brx& aValue) = 0;
 };
 
-class PlaylistManager : public INameable
+
+	
+class Track
 {
+public:
+	Track(const TUint aId, const Brn& aUdn, const Brn& aMetadata);
+	
+	TUint Id() const;
+	bool IsId(const TUint aId) const;
+	
+	const Brn& Udn() const;
+	const Brn& Metadata() const;
+	
+private:
+	const TUint iId;
+	const Brn iUdn;
+	const Brn iMetadata;
+};
+
+class Playlist
+{
+public:
+	static const TUint kMaxTracks = 1000;
+
+public:
+	Playlist(const IdGenerator& aIdGenerator, const PlaylistHeader& aHeader);
+	~Playlist();
+	
+	TUint Id() const;
+	bool IsId(const TUint aId) const;
+	
+	const Brx& IdArray() const;
+	
+	const Track* GetTrack(const TUint aId) const;
+	
+	void Insert(const Brn& aUdn, const Brn& aMetadata);
+	void Delete(const TUint aId);
+	void DeleteAll();
+	
+private:
+	IdGenerator iIdGenerator;
+	
+	const TUint iId;
+	
+	std::list<Track*> iTracks;
+	Bws<kMaxTracks> iIdArray;
+};	
+
+	
+
+class PlaylistManager : public INameable
+{	
 public:
 	static const TUint kMaxNameBytes = 30;
 	static const TUint kMaxImageBytes = 30 * 1024;
 	static const TUint kMaxMimeTypeBytes = 100;
-	static const TUint kMaxTracks = 1000;
-
+	static const TUint kMaxPlaylists = 500;
+	
 public:
     PlaylistManager(OpenHome::Net::DvDevice& aDevice, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
 	virtual ~PlaylistManager();
@@ -72,15 +137,25 @@ public:
 	const TUint Token() const;
 	const Brx& IdArray() const;
 	const Brx& TokenArray() const;
-	const TBool TokenChanged(const TUint aValue) const;
+	const TBool TokenChanged(const TUint aToken) const;
 	
 	const PlaylistHeader* Header(TUint aId) const;
+	const Playlist* GetPlaylist(TUint aId);
 	
 	const TUint Insert(const TUint aAfterId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
-	const TUint NewId();
 
 private:
+	void WriteToc() const;
+	void WritePlaylist(const PlaylistHeader& aHeader) const;
+	void WritePlaylist(const PlaylistHeader& aHeader, const Playlist& aPlaylist) const;	
+	
+	void UpdateArrays();
+	
+	mutable Mutex iMutex;
+	
 	OpenHome::Net::DvDevice& iDevice;
+	
+	IdGenerator iIdGenerator;
 	
 	Bws<kMaxNameBytes> iName;
 	TIpAddress iAdapter;
@@ -88,14 +163,15 @@ private:
 	Bws<kMaxMimeTypeBytes> iMimeType;
 	
 	std::list<PlaylistHeader*> iPlaylistHeaders;
+	std::list<Playlist*> iPlaylists;
 	TUint iToken;
-	Bwh iIdArray;
-	Bwh iTokenArray;
-	
-	TUint iNextId;
+	Bws<kMaxPlaylists> iIdArray;
+	Bws<kMaxPlaylists> iTokenArray;
 	
 	OpenHome::Net::ProviderPlaylistManager* iProvider;
 };
+	
+
 
 /*class PlaylistManagerSession : public SocketTcpSession
 {
