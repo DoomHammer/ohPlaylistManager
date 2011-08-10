@@ -1,6 +1,8 @@
 #ifndef HEADER_PLAYLISTMANAGER
 #define HEADER_PLAYLISTMANAGER
 
+#include <list>
+
 #include <OpenHome/Buffer.h>
 #include <OpenHome/Net/Core/DvDevice.h>
 
@@ -15,29 +17,29 @@ namespace Media {
 	
 class Playlist;
 
-class IPlaylistManagerPersist
+	
+class PlaylistHeader
 {
 public:
-	virtual ~IPlaylistManagerPersist() {}
+	static const TUint kMaxNameBytes = 30;
+	static const TUint kMaxDescriptionBytes = 100;
 	
-    virtual TUint PlaylistCount() const = 0;
-    virtual TUint MaxTrackCount() const = 0;
-    virtual TUint MaxPlaylistCount() const = 0;
-    virtual void Save(const Playlist& aPlaylist) = 0;
-    virtual void Delete(const Playlist& aPlaylist) = 0;
-};
-	
-class PlaylistManagerPersistFs : public IPlaylistManagerPersist
-{
 public:
-	PlaylistManagerPersistFs();
-	virtual ~PlaylistManagerPersistFs() {}
+	PlaylistHeader(const TUint aId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
 	
-	virtual TUint PlaylistCount() const;
-    virtual TUint MaxTrackCount() const;
-    virtual TUint MaxPlaylistCount() const;
-    virtual void Save(const Playlist& aPlaylist);
-    virtual void Delete(const Playlist& aPlaylist);
+	TUint Id() const;
+	bool IsId(TUint aId) const;
+	
+	const Brx& Name() const;
+	const Brx& Description() const;
+	TUint ImageId() const;
+	
+private:
+	TUint iId;
+	
+	Bws<kMaxNameBytes> iName;
+	Bws<kMaxDescriptionBytes> iDescription;
+	TUint iImageId;
 };
 
 class INameable
@@ -54,20 +56,44 @@ public:
 	static const TUint kMaxNameBytes = 30;
 	static const TUint kMaxImageBytes = 30 * 1024;
 	static const TUint kMaxMimeTypeBytes = 100;
+	static const TUint kMaxTracks = 1000;
 
 public:
-    PlaylistManager(OpenHome::Net::DvDevice& aDevice, IPlaylistManagerPersist& aPersist, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
+    PlaylistManager(OpenHome::Net::DvDevice& aDevice, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
 	virtual ~PlaylistManager();
 	
 	virtual void SetName(const Brx& aValue);
 	
 	void SetAdapter(const TIpAddress& aAdapter);
+	
+	const Brx& Name() const;
+	const TIpAddress& Adapter() const;
+	
+	const TUint Token() const;
+	const Brx& IdArray() const;
+	const Brx& TokenArray() const;
+	const TBool TokenChanged(const TUint aValue) const;
+	
+	const PlaylistHeader* Header(TUint aId) const;
+	
+	const TUint Insert(const TUint aAfterId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
+	const TUint NewId();
+
 private:
 	OpenHome::Net::DvDevice& iDevice;
-    IPlaylistManagerPersist& iPersist;
-    Bws<kMaxNameBytes> iName;
+	
+	Bws<kMaxNameBytes> iName;
+	TIpAddress iAdapter;
 	Bws<kMaxImageBytes> iImage;
 	Bws<kMaxMimeTypeBytes> iMimeType;
+	
+	std::list<PlaylistHeader*> iPlaylistHeaders;
+	TUint iToken;
+	Bwh iIdArray;
+	Bwh iTokenArray;
+	
+	TUint iNextId;
+	
 	OpenHome::Net::ProviderPlaylistManager* iProvider;
 };
 

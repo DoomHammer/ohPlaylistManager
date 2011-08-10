@@ -85,10 +85,11 @@ int CDECL main(int aArgc, char* aArgv[])
     UpnpLibrary::DestroySubnetList(subnetList);
 
     printf("Using subnet %d.%d.%d.%d\n", subnet&0xff, (subnet>>8)&0xff, (subnet>>16)&0xff, (subnet>>24)&0xff);
+	printf("Using adapter %d.%d.%d.%d\n", adapter&0xff, (adapter>>8)&0xff, (adapter>>16)&0xff, (adapter>>24)&0xff);
     
     Brhz name(optionName.Value());
 
-    UpnpLibrary::StartDv();
+	UpnpLibrary::StartCombined(subnet);
 
 	Bwh udn("device");
     RandomiseUdn(udn, adapter);
@@ -112,8 +113,7 @@ int CDECL main(int aArgc, char* aArgv[])
 
 	// create managers
 	
-	PlaylistManagerPersistFs* persist = new PlaylistManagerPersistFs();
-	PlaylistManager* playlistManager = new PlaylistManager(*device, *persist, adapter, name, icon, Brx::Empty());
+	PlaylistManager* playlistManager = new PlaylistManager(*device, adapter, name, icon, Brx::Empty());
     
     device->SetEnabled();
 
@@ -128,7 +128,6 @@ int CDECL main(int aArgc, char* aArgv[])
 	}	
 
 	delete playlistManager;
-	delete persist;
     delete device;
 	
 	UpnpLibrary::Close();

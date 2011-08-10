@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6508E7DB13E973020058AB11 /* PlaylistManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6508E7D813E973020058AB11 /* PlaylistManager.cpp */; };
 		6508E7DC13E973020058AB11 /* ohPlaylistManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */; };
+		659C341213F013AE0023A136 /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 659C341113F013AE0023A136 /* Stream.cpp */; };
 		65C6E38A13EAAD400005E0A8 /* libohNetDevices.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65C6E38913EAAD400005E0A8 /* libohNetDevices.a */; };
 		65E10B2013E9926F00F3E45D /* libohNetCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65E10B1F13E9926F00F3E45D /* libohNetCore.a */; };
 		65E10C2713E9A19000F3E45D /* libTestFramework.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65E10C2613E9A19000F3E45D /* libTestFramework.a */; };
@@ -32,6 +33,8 @@
 		6508E7D813E973020058AB11 /* PlaylistManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaylistManager.cpp; sourceTree = "<group>"; };
 		6508E7D913E973020058AB11 /* PlaylistManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistManager.h; sourceTree = "<group>"; };
 		6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ohPlaylistManager.cpp; sourceTree = "<group>"; };
+		659C340E13F00A8E0023A136 /* Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stream.h; sourceTree = "<group>"; };
+		659C341113F013AE0023A136 /* Stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stream.cpp; sourceTree = "<group>"; };
 		65C6E38913EAAD400005E0A8 /* libohNetDevices.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libohNetDevices.a; path = /Users/davidd/work/openhome/ohNet/Build/Obj/Mac/Debug/libohNetDevices.a; sourceTree = "<absolute>"; };
 		65C6E44E13EAC3EC0005E0A8 /* Icon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Icon.h; sourceTree = "<group>"; };
 		65E10B1F13E9926F00F3E45D /* libohNetCore.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libohNetCore.a; path = /Users/davidd/work/openhome/ohNet/Build/Obj/Mac/Debug/libohNetCore.a; sourceTree = "<absolute>"; };
@@ -74,6 +77,8 @@
 				65E10C2613E9A19000F3E45D /* libTestFramework.a */,
 				65C6E38913EAAD400005E0A8 /* libohNetDevices.a */,
 				65C6E44E13EAC3EC0005E0A8 /* Icon.h */,
+				659C340E13F00A8E0023A136 /* Stream.h */,
+				659C341113F013AE0023A136 /* Stream.cpp */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -146,6 +151,7 @@
 			files = (
 				6508E7DB13E973020058AB11 /* PlaylistManager.cpp in Sources */,
 				6508E7DC13E973020058AB11 /* ohPlaylistManager.cpp in Sources */,
+				659C341213F013AE0023A136 /* Stream.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
