@@ -6,6 +6,9 @@
 #include <OpenHome/Private/Stream.h>
 #include <OpenHome/Buffer.h>
 
+EXCEPTION(ReaderFileError);
+EXCEPTION(WriterFileError);
+
 namespace OpenHome {
 namespace Media {
 

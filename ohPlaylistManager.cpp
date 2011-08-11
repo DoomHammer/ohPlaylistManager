@@ -65,7 +65,7 @@ int CDECL main(int aArgc, char* aArgv[])
 {
     OptionParser parser;
     
-    OptionString optionName("-n", "--name", Brn("Openhome PlaylistManager"), "[name] name of the playlist manager");
+    OptionString optionName("-n", "--name", Brn("ohPlaylistManager"), "[name] name of the playlist manager");
     parser.AddOption(&optionName);
 	
 	OptionUint optionAdapter("-a", "--adapter", 0, "[adapter] index of network adapter to use");

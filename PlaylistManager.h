@@ -22,6 +22,7 @@ class IdGenerator
 {
 public:
 	IdGenerator();
+	IdGenerator(TUint aNextId);
 	
 	TUint NewId();
 	
@@ -37,6 +38,7 @@ public:
 	
 public:
 	PlaylistHeader(const TUint aId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
+	PlaylistHeader(const TUint aId, IReader& aReader);
 	
 	TUint Id() const;
 	bool IsId(const TUint aId) const;
@@ -48,13 +50,15 @@ public:
 	const Brx& Description() const;
 	TUint ImageId() const;
 	
+	void ToXml(IWriter& aWriter) const;
+	
 private:
 	const TUint iId;
 	TUint iToken;
 	
-	const Bws<kMaxNameBytes> iName;
-	const Bws<kMaxDescriptionBytes> iDescription;
-	const TUint iImageId;
+	Bws<kMaxNameBytes> iName;
+	Bws<kMaxDescriptionBytes> iDescription;
+	TUint iImageId;
 };
 
 class INameable
@@ -70,6 +74,9 @@ public:
 class Track
 {
 public:
+	static const TUint kMaxMetadataBytes = 4096;
+	
+public:
 	Track(const TUint aId, const Brn& aUdn, const Brn& aMetadata);
 	
 	TUint Id() const;
@@ -77,6 +84,8 @@ public:
 	
 	const Brn& Udn() const;
 	const Brn& Metadata() const;
+	
+	void ToXml(IWriter& aWriter) const;
 	
 private:
 	const TUint iId;
@@ -103,6 +112,8 @@ public:
 	void Insert(const Brn& aUdn, const Brn& aMetadata);
 	void Delete(const TUint aId);
 	void DeleteAll();
+	
+	void ToXml(IWriter& aWriter) const;
 	
 private:
 	IdGenerator iIdGenerator;
@@ -139,15 +150,16 @@ public:
 	const Brx& TokenArray() const;
 	const TBool TokenChanged(const TUint aToken) const;
 	
-	const PlaylistHeader* Header(TUint aId) const;
-	const Playlist* GetPlaylist(TUint aId);
+	const PlaylistHeader* Header(const TUint aId) const;
+	const Playlist* GetPlaylist(const TUint aId);
 	
 	const TUint Insert(const TUint aAfterId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
+	void Delete(const TUint aId);
 
 private:
 	void WriteToc() const;
 	void WritePlaylist(const PlaylistHeader& aHeader) const;
-	void WritePlaylist(const PlaylistHeader& aHeader, const Playlist& aPlaylist) const;	
+	void WritePlaylist(const PlaylistHeader& aHeader, const Playlist& aPlaylist) const;
 	
 	void UpdateArrays();
 	

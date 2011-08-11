@@ -2,6 +2,7 @@
 #include <algorithm>
 
 #include <OpenHome/Buffer.h>
+#include <OpenHome/Private/Parser.h>
 #include <OpenHome/Private/Ascii.h>
 #include <OpenHome/Private/Converter.h>
 #include <OpenHome/Net/Core/DvAvOpenhomeOrgPlaylistManager1.h>
@@ -22,6 +23,8 @@ namespace Net {
 	
 	static const TInt kIdNotFound = 800;
 	static const Brn kIdNotFoundMsg("Id not found");
+	static const TInt kInvalidRequest = 802;
+	static const Brn kInvalidRequestMsg("Space separated id request list invalid");
 	
 	class ProviderPlaylistManager : public DvProviderAvOpenhomeOrgPlaylistManager1
 	{
@@ -125,6 +128,55 @@ void ProviderPlaylistManager::PlaylistReadArray(IInvocationResponse& aResponse, 
 
 void ProviderPlaylistManager::PlaylistReadMetadata(IInvocationResponse& aResponse, TUint aVersion, const Brx& aIdList, IInvocationResponseString& aMetadata)
 {
+	TUint tracksMax;
+    GetPropertyTracksMax(tracksMax);
+    vector<TUint> v;
+    v.reserve(tracksMax);
+	
+	try {
+        Parser parser(aIdList);
+        Brn id;
+        id.Set(parser.Next(' '));
+		
+        for( ; id != Brx::Empty(); id.Set(parser.Next(' ')) ) {
+            v.push_back(Ascii::Uint(id));
+            if(v.size() > tracksMax) {
+                THROW(AsciiError);
+            }
+        }
+    }
+    catch(AsciiError) {
+        aResponse.Error(kInvalidRequest, kInvalidRequestMsg);
+    }
+	
+	Brn containerStart("<container id=");
+	Brn containerMiddle(" restricted=\"True\">");
+	Brn containerEnd("</container>");
+	Brn titleStart("<dc:title>");
+	Brn titleEnd("</dc:title>");
+	Brn albumArtStart("<upnp:albumArtURI>");
+	Brn albumArtEnd("</upnp:albumArtURI>");
+	Brn image("image:");
+	
+	aResponse.Start();
+	
+	aMetadata.Write(Brn("<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\">"));
+	for(vector<TUint>::const_iterator id = v.begin(); id != v.end(); ++id)
+	{
+		const PlaylistHeader* header = iPlaylistManager.Header(*id);
+		
+		if(header != NULL)
+		{
+			aMetadata.Write(containerStart); Ascii::StreamWriteUint(aMetadata, header->Id()); aMetadata.Write(containerMiddle);
+			aMetadata.Write(titleStart); aMetadata.Write(header->Name()); aMetadata.Write(titleEnd);
+			aMetadata.Write(albumArtStart); aMetadata.Write(image); Ascii::StreamWriteUint(aMetadata, header->ImageId()); aMetadata.Write(albumArtEnd);
+			aMetadata.Write(containerEnd);
+		}
+	}
+	aMetadata.Write(Brn("</DIDL-Lite>"));
+	aMetadata.WriteFlush();
+	
+	aResponse.End();
 }
 
 void ProviderPlaylistManager::PlaylistRead(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseString& aName, IInvocationResponseString& aDescription, IInvocationResponseUint& aImageId)
@@ -149,7 +201,20 @@ void ProviderPlaylistManager::PlaylistRead(IInvocationResponse& aResponse, TUint
 
 void ProviderPlaylistManager::PlaylistUpdate(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aName, const Brx& aDescription, TUint aImageId)
 {
-	UpdateArrays();
+	try
+	{
+		iPlaylistManager.Insert(aId, aName, aDescription, aImageId);
+		iPlaylistManager.Delete(aId);
+		
+		aResponse.Start();
+		aResponse.End();
+		
+		UpdateArrays();
+	}
+	catch (PlaylistManagerError& e)
+	{
+		aResponse.Error(kIdNotFound, kIdNotFoundMsg);
+	}
 }
 
 void ProviderPlaylistManager::PlaylistInsert(IInvocationResponse& aResponse, TUint aVersion, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IInvocationResponseUint& aNewId)
@@ -172,6 +237,11 @@ void ProviderPlaylistManager::PlaylistInsert(IInvocationResponse& aResponse, TUi
 
 void ProviderPlaylistManager::PlaylistDeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aValue)
 {
+	iPlaylistManager.Delete(aValue);
+	
+	aResponse.Start();
+	aResponse.End();
+	
 	UpdateArrays();
 }
 
@@ -287,6 +357,11 @@ void PlaylistManagerPersistFs::Delete(const Playlist& aPlaylist)
 {
 }*/
 
+IdGenerator::IdGenerator(const TUint aNextId)
+: iNextId(aNextId)
+{
+}
+
 
 IdGenerator::IdGenerator()
 	: iNextId(0)
@@ -306,6 +381,33 @@ PlaylistHeader::PlaylistHeader(const TUint aId, const Brx& aName, const Brx& aDe
 	, iImageId(aImageId)
     , iToken(0)
 {
+}
+
+PlaylistHeader::PlaylistHeader(const TUint aId, IReader& aReader)
+	: iId(aId)
+	
+{
+	aReader.ReadUntil('<');
+	Brn nameTag = aReader.ReadUntil('>');
+	if(nameTag == Brn("Name"))
+	{
+		iName.Replace(aReader.ReadUntil('<'));
+		
+		aReader.ReadUntil('<');
+		Brn descriptionTag = aReader.ReadUntil('>');
+		if(descriptionTag == Brn("Description"))
+		{
+			iDescription.Replace(aReader.ReadUntil('<'));
+			
+			aReader.ReadUntil('<');
+			Brn imageTag = aReader.ReadUntil('>');
+			if(imageTag == Brn("ImageId"))
+			{
+				iImageId = Ascii::Uint(aReader.ReadUntil('<'));
+				aReader.ReadUntil('>');
+			}
+		}
+	}
 }
 
 TUint PlaylistHeader::Id() const
@@ -343,6 +445,17 @@ TUint PlaylistHeader::ImageId() const
 	return iImageId;
 }
 
+void PlaylistHeader::ToXml(IWriter& aWriter) const
+{
+	WriterAscii ascii(aWriter);
+	
+	ascii.Write(Brn("  <Name>")); ascii.Write(Name()); ascii.Write(Brn("</Name>\n"));
+	ascii.Write(Brn("  <Description>")); ascii.Write(Description()); ascii.Write(Brn("</Description>\n"));
+	ascii.Write(Brn("  <ImageId>")); ascii.WriteUint(ImageId()); ascii.Write(Brn("</ImageId>\n"));
+	
+	ascii.WriteFlush();
+}
+
 
 
 Track::Track(const TUint aId, const Brn& aUdn, const Brn& aMetadata)
@@ -370,6 +483,17 @@ const Brn& Track::Udn() const
 const Brn& Track::Metadata() const
 {
 	return iMetadata;
+}
+
+void Track::ToXml(IWriter& aWriter) const
+{
+	WriterAscii ascii(aWriter);
+	
+	ascii.Write(Brn("    <Udn>")); ascii.Write(Udn()); ascii.Write(Brn("    </Udn>"));
+	
+	ascii.Write(Brn("    <Metadata>")); Converter::ToXmlEscaped(ascii, Metadata()); ascii.Write(Brn("    </Metadata>"));
+	
+	ascii.WriteFlush();
 }
 
 
@@ -432,6 +556,23 @@ void Playlist::DeleteAll()
 {
 }
 
+void Playlist::ToXml(IWriter& aWriter) const
+{
+	WriterAscii ascii(aWriter);
+	
+	Brn trackStart("  <Track>");
+	Brn trackEnd("  </Track>");
+	
+	for(list<Track*>::const_iterator i = iTracks.begin(); i != iTracks.end(); ++i)
+	{
+		ascii.Write(trackStart);
+		(*i)-> ToXml(ascii);
+		ascii.Write(trackEnd);
+	}
+	
+	ascii.WriteFlush();
+}
+
 
 
 
@@ -446,6 +587,50 @@ PlaylistManager::PlaylistManager(DvDevice& aDevice, const TIpAddress& aAdapter, 
 	, iTokenArray(Brx::Empty())
 	, iMutex("PMngr")
 {
+	try 
+	{
+		ReaderFile toc("Toc.txt");
+		Srs<20> tocReader(toc);
+		
+		TUint lastId = 0;
+		TUint count = Ascii::Uint(tocReader.ReadUntil('\n'));
+		for(int i = 0; i < count; ++i)
+		{
+			const Brn name = tocReader.ReadUntil('\n');
+			ReaderBuffer nameReader;
+			nameReader.Set(name);
+			TUint id = Ascii::Uint(nameReader.ReadUntil('.'));
+			
+			if(id > lastId)
+			{
+				lastId = id;
+			}
+			
+			Bws<Ascii::kMaxUintStringBytes + 1> filename(name);
+			ReaderFile playlist(filename.PtrZ());
+			Srs<Track::kMaxMetadataBytes> playlistReader(playlist);
+			
+			playlistReader.ReadUntil('<');
+			Brn playlistTag = playlistReader.ReadUntil('>');
+			if(playlistTag == Brn("Playlist"))
+			{
+				PlaylistHeader* header = new PlaylistHeader(id, playlistReader);
+				iPlaylistHeaders.push_back(header);
+			}
+			
+			playlist.Close();
+		}
+		
+		toc.Close();
+		
+		UpdateArrays();
+		
+		iIdGenerator = IdGenerator(lastId);
+	}
+	catch(ReaderFileError)
+	{
+	}
+	
 	iProvider = new ProviderPlaylistManager(aDevice, *this, aAdapter, aName, kMaxPlaylists, Playlist::kMaxTracks);
 }
 
@@ -515,7 +700,7 @@ const TBool PlaylistManager::TokenChanged(const TUint aToken) const
 	return changed;
 }
 
-const PlaylistHeader* PlaylistManager::Header(TUint aId) const
+const PlaylistHeader* PlaylistManager::Header(const TUint aId) const
 {
 	iMutex.Wait();
 	
@@ -537,7 +722,7 @@ const PlaylistHeader* PlaylistManager::Header(TUint aId) const
 	}
 }
 
-const Playlist* PlaylistManager::GetPlaylist(TUint aId)
+const Playlist* PlaylistManager::GetPlaylist(const TUint aId)
 {
 	iMutex.Wait();
 	
@@ -609,6 +794,30 @@ const TUint PlaylistManager::Insert(const TUint aAfterId, const Brx& aName, cons
 	return id;
 }
 
+void PlaylistManager::Delete(const TUint aId)
+{
+	iMutex.Wait();
+	
+	if(aId == 0)
+	{
+		iMutex.Signal();
+        return;
+    }
+	list<PlaylistHeader*>::iterator i = find_if(iPlaylistHeaders.begin(), iPlaylistHeaders.end(), bind2nd(mem_fun(&PlaylistHeader::IsId), aId));
+	if(i == iPlaylistHeaders.end()) {
+		iMutex.Signal();
+		return;
+	}
+	iPlaylistHeaders.erase(i);
+	
+	UpdateArrays();
+	
+	WriteToc();
+	// delete old playlist file.
+	
+	iMutex.Signal();
+}
+
 void PlaylistManager::UpdateArrays()
 {
 	++iToken;
@@ -634,6 +843,8 @@ void PlaylistManager::WriteToc() const
 	Sws<1024> writer(file);
 	WriterAscii ascii(writer);
 	
+	ascii.WriteUint(iPlaylistHeaders.size());
+	ascii.Write(Brn("\n"));
 	for(list<PlaylistHeader*>::const_iterator i = iPlaylistHeaders.begin(); i != iPlaylistHeaders.end(); ++i)
 	{
 		ascii.WriteUint((*i)->Id());
@@ -657,19 +868,35 @@ void PlaylistManager::WritePlaylist(const PlaylistHeader& aHeader) const
 	
 	ascii.Write(Brn("<Playlist>\n"));
 	
-	ascii.Write(Brn("  <name>")); ascii.Write(aHeader.Name()); ascii.Write(Brn("</name>\n"));
-	ascii.Write(Brn("  <description>")); ascii.Write(aHeader.Description()); ascii.Write(Brn("</description>\n"));
-	ascii.Write(Brn("  <imageId>")); ascii.WriteUint(aHeader.ImageId()); ascii.Write(Brn("</imageId>\n"));
+	aHeader.ToXml(ascii);
 	
 	ascii.Write(Brn("</Playlist>\n"));
 	
-	writer.WriteFlush();
+	ascii.WriteFlush();
 	
 	file.Close();
 }
 
 void PlaylistManager::WritePlaylist(const PlaylistHeader& aHeader, const Playlist& aPlaylist) const
 {
+	Bws<Ascii::kMaxUintStringBytes + 5> filename;
+	Ascii::AppendDec(filename, aHeader.Id());
+	filename.Append(".txt");
+	
+	WriterFile file(filename.PtrZ());
+	Sws<1024> writer(file);
+	WriterAscii ascii(writer);
+	
+	ascii.Write(Brn("<Playlist>\n"));
+	
+	aHeader.ToXml(ascii);
+	aPlaylist.ToXml(ascii);
+	
+	ascii.Write(Brn("</Playlist>\n"));
+	
+	ascii.WriteFlush();
+	
+	file.Close();	
 }
 
 //void PlaylistManager::WritePlaylist(
