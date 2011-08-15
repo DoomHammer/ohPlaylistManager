@@ -285,6 +285,25 @@ void ProviderPlaylistManager::PlaylistArraysChanged(IInvocationResponse& aRespon
 
 void ProviderPlaylistManager::Read(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId, IInvocationResponseString& aMetadata)
 {
+	Bws<Track::kMaxMetadataBytes> metadata;
+	
+	try
+	{
+		iPlaylistManager.Read(aId, aTrackId, metadata);
+		
+		aResponse.Start();
+		aMetadata.Write(metadata);
+		aMetadata.WriteFlush();
+		aResponse.End();
+	}
+	catch(PlaylistManagerError& e)
+	{
+		aResponse.Error(kIdNotFound, kIdNotFoundMsg);
+	}
+	catch(PlaylistError& e)
+	{
+		aResponse.Error(kIdNotFound, kIdNotFoundMsg);
+	}
 }
 
 void ProviderPlaylistManager::ReadList(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aTrackIdList, IInvocationResponseString& aTrackList)
@@ -319,10 +338,18 @@ void ProviderPlaylistManager::Insert(IInvocationResponse& aResponse, TUint aVers
 
 void ProviderPlaylistManager::DeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId, TUint aValue)
 {
+	iPlaylistManager.Delete(aTrackId, aValue);
+	
+	aResponse.Start();
+	aResponse.End();
 }
 
 void ProviderPlaylistManager::DeleteAll(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId)
 {
+	iPlaylistManager.DeleteAll(aTrackId);
+	
+	aResponse.Start();
+	aResponse.End();
 }
 
 void ProviderPlaylistManager::MetadataChanged()
@@ -342,7 +369,7 @@ void ProviderPlaylistManager::PlaylistChanged()
 
 void ProviderPlaylistManager::UpdateMetadata()
 {
-	Bws<500> metadata;
+	Bws<PlaylistManager::kMaxMetadataBytes * 2> metadata;
 	
 	iPlaylistManager.Metadata(metadata);
 	
@@ -531,12 +558,12 @@ bool Track::IsId(const TUint aId) const
 	return aId == iId;
 }
 
-const Brn& Track::Udn() const
+const Brx& Track::Udn() const
 {
 	return iUdn;
 }
 
-const Brn& Track::Metadata() const
+const Brx& Track::Metadata() const
 {
 	return iMetadata;
 }
@@ -567,19 +594,25 @@ PlaylistData::PlaylistData(const TUint aId, const Brx& aFilename)
 	
 	while(true)
 	{
-		reader.ReadUntil('<');
-		if(reader.ReadUntil('>') == trackTag)
+		reader.ReadUntil('<');								// beginning of <Track>
+		if(reader.ReadUntil('>') == trackTag)				// end of <Track>
 		{
-			reader.ReadUntil('<');
-			if(reader.ReadUntil('>') == udnTag)
+			reader.ReadUntil('<');							// beginning of <Udn>
+			if(reader.ReadUntil('>') == udnTag)				// end of <Udn>
 			{
-				Brn udn = reader.ReadUntil('<');
-				reader.ReadUntil('<');
+				Brn udn = reader.ReadUntil('<');			// beginning of </Udn>
+				reader.ReadUntil('<');						// end of </Udn>
 				if(reader.ReadUntil('>') == metadataTag)
 				{
-					Brn metadata = reader.ReadUntil('<');
+					Brn escaped = reader.ReadUntil('<');	// beginning of </Metadata>
+					Bws<Track::kMaxMetadataBytes * 2> metadata;
+					metadata.Replace(escaped);
+					Converter::FromXmlEscaped(metadata);
 					
 					iTracks.push_back(new Track(iIdGenerator.NewId(), udn, metadata));
+					
+					reader.ReadUntil('>');					// end of </Metadata>
+					reader.ReadUntil('>');					// end of </Track>
 				}
 			}
 		}
@@ -616,6 +649,17 @@ void PlaylistData::IdArray(Bwx& aIdArray)
     }
 }
 
+void PlaylistData::Read(const TUint aTrackId, Bwx& aMetadata)
+{
+	list<Track*>::const_iterator i = find_if(iTracks.begin(), iTracks.end(), bind2nd(mem_fun(&Track::IsId), aTrackId));
+	if(i == iTracks.end())
+	{
+		THROW(PlaylistError);
+	}
+	
+	aMetadata.Append((*i)->Metadata());
+}
+
 const TUint PlaylistData::Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata)
 {
     if(iTracks.size() == kMaxTracks)
@@ -649,13 +693,17 @@ void PlaylistData::Delete(const TUint aId)
 	list<Track*>::iterator i = find_if(iTracks.begin(), iTracks.end(), bind2nd(mem_fun(&Track::IsId), aId));
 	if(i != iTracks.end())
 	{
+		delete (*i);
 		iTracks.erase(i);
 	}
 }
 
 void PlaylistData::DeleteAll()
 {
-	
+	for(list<Track*>::iterator i = iTracks.begin(); i != iTracks.end(); ) {
+		delete (*i);
+		i = iTracks.erase(i);
+	}
 }
 
 void PlaylistData::ToXml(IWriter& aWriter) const
@@ -663,11 +711,11 @@ void PlaylistData::ToXml(IWriter& aWriter) const
 	WriterAscii ascii(aWriter);
 	
 	Brn trackStart("  <Track>\n");
-	Brn udnStart("    <Udn>\n");
-	Brn metadataStart("    <Metadata>\n");
+	Brn udnStart("    <Udn>");
+	Brn metadataStart("    <Metadata>");
 	Brn trackEnd("  </Track>\n");
-	Brn udnEnd("    </Udn>\n");
-	Brn metadataEnd("    </Metadata>\n");
+	Brn udnEnd("</Udn>\n");
+	Brn metadataEnd("</Metadata>\n");
 	
 	for(list<Track*>::const_iterator i = iTracks.begin(); i != iTracks.end(); ++i)
 	{
@@ -750,6 +798,28 @@ void Playlist::IdArray(Bwx& aIdArray)
 	iMutex.Signal();
 }
 
+void Playlist::Read(const TUint aTrackId, Bwx& aMetadata)
+{
+	iMutex.Wait();
+	
+	if(iData == NULL)
+	{
+		iData = iCache->Data(*this, this);
+	}
+	
+	try
+	{
+		iData->Read(aTrackId, aMetadata);
+	}
+	catch(PlaylistError& e)
+	{
+		iMutex.Signal();
+		throw e;
+	}
+	
+	iMutex.Signal();
+}
+
 const TUint Playlist::Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata)
 {
 	iMutex.Wait();
@@ -762,6 +832,7 @@ const TUint Playlist::Insert(const TUint aAfterId, const Brx& aUdn, const Brx& a
 	try
 	{
 		TUint newId = iData->Insert(aAfterId, aUdn, aMetadata);
+		++iToken;
 		
 		iMutex.Signal();
 		
@@ -789,6 +860,7 @@ void Playlist::Delete(const TUint aId)
 	}
 	
 	iData->Delete(aId);
+	++iToken;
 	
 	iMutex.Signal();
 }
@@ -803,6 +875,7 @@ void Playlist::DeleteAll()
 	}
 	
 	iData->DeleteAll();
+	++iToken;
 	
 	iMutex.Signal();
 }
@@ -884,8 +957,6 @@ PlaylistManager::PlaylistManager(DvDevice& aDevice, const TIpAddress& aAdapter, 
 		
 		toc.Close();
 		
-		UpdateArrays();
-		
 		iIdGenerator = IdGenerator(lastId);
 	}
 	catch(ReaderFileError)
@@ -893,6 +964,10 @@ PlaylistManager::PlaylistManager(DvDevice& aDevice, const TIpAddress& aAdapter, 
 	}
 	
 	iProvider = new ProviderPlaylistManager(aDevice, *this, kMaxPlaylists, PlaylistData::kMaxTracks);
+	
+	MetadataChanged();
+	PlaylistsChanged();
+	PlaylistChanged();
 }
 
 PlaylistManager::~PlaylistManager()
@@ -908,13 +983,13 @@ PlaylistManager::~PlaylistManager()
 void PlaylistManager::SetName(const Brx& aValue)
 {
 	iName.Replace(aValue);
-	iProvider->MetadataChanged();
+	MetadataChanged();
 }
 
 void PlaylistManager::SetAdapter(const TIpAddress& aAdapter)
 {
 	iAdapter = aAdapter;
-	iProvider->MetadataChanged();
+	MetadataChanged();
 }
 
 const Brx& PlaylistManager::Name() const
@@ -999,9 +1074,21 @@ void PlaylistManager::PlaylistReadMetadata(std::vector<TUint>& aIdList, IWriter&
 	aWriter.WriteFlush();
 }
 
-void PlaylistManager::UpdateArrays()
+void PlaylistManager::MetadataChanged()
+{
+	iProvider->MetadataChanged();
+}
+
+void PlaylistManager::PlaylistsChanged()
 {
 	++iToken;
+	iProvider->PlaylistsChanged();
+}
+
+void PlaylistManager::PlaylistChanged()
+{
+	++iToken;
+	iProvider->PlaylistChanged();
 }
 
 void PlaylistManager::IdArray(Bwx& aIdArray) const
@@ -1079,8 +1166,7 @@ const TUint PlaylistManager::PlaylistInsert(const TUint aAfterId, const Brx& aNa
 	
 	Playlist* playlist = new Playlist(&iCache, id, filename, aName, aDescription, aImageId);
 	iPlaylists.insert(i, playlist);
-	
-	UpdateArrays();
+	PlaylistsChanged();
 	
 	WriteToc();
 	WritePlaylist(*playlist);
@@ -1105,8 +1191,7 @@ void PlaylistManager::PlaylistDelete(const TUint aId)
 		return;
 	}
 	iPlaylists.erase(i);
-	
-	UpdateArrays();
+	PlaylistsChanged();
 	
 	try
 	{
@@ -1143,6 +1228,29 @@ void PlaylistManager::IdArray(const TUint aId, Bwx& aIdArray)
 	iMutex.Signal();
 }
 
+void PlaylistManager::Read(const TUint aId, const TUint aTrackId, Bwx& aMetadata)
+{
+	iMutex.Wait();
+	
+	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
+	if(i == iPlaylists.end()) {
+		iMutex.Signal();
+		THROW(PlaylistManagerError);
+	}
+
+	try
+	{
+		(*i)->Read(aTrackId, aMetadata);
+	
+		iMutex.Signal();
+	}
+	catch(PlaylistError& e)
+	{
+		iMutex.Signal();
+		throw e;
+	}
+}
+
 const TUint PlaylistManager::Insert(const TUint aId, const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata)
 {
 	iMutex.Wait();
@@ -1153,13 +1261,27 @@ const TUint PlaylistManager::Insert(const TUint aId, const TUint aAfterId, const
 		THROW(PlaylistManagerError);
 	}
 	
-	const TUint newId = (*i)->Insert(aAfterId, aUdn, aMetadata);
-	
-	WritePlaylist(*(*i));
-	
-	iMutex.Signal();
-	
-	return newId;
+	try
+	{
+		const TUint newId = (*i)->Insert(aAfterId, aUdn, aMetadata);
+		PlaylistChanged();
+		
+		WritePlaylist(*(*i));
+		
+		iMutex.Signal();
+		
+		return newId;
+	}
+	catch(PlaylistFull& e)
+	{
+		iMutex.Signal();
+		throw e;
+	}
+	catch(PlaylistError& e)
+	{
+		iMutex.Signal();
+		throw e;
+	}
 }
 
 void PlaylistManager::Delete(const TUint aId, const TUint aTrackId)
@@ -1173,6 +1295,7 @@ void PlaylistManager::Delete(const TUint aId, const TUint aTrackId)
 	}
 	
 	(*i)->Delete(aTrackId);
+	PlaylistChanged();
 	
 	WritePlaylist(*(*i));
 	
@@ -1190,6 +1313,7 @@ void PlaylistManager::DeleteAll(const TUint aId)
 	}
 	
 	(*i)->DeleteAll();
+	PlaylistChanged();
 	
 	WritePlaylist(*(*i));
 	

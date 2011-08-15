@@ -59,6 +59,7 @@ class IPlaylistData
 public:
 	virtual void IdArray(Bwx& aIdArray) = 0;
 	
+	virtual void Read(const TUint aTrackId, Bwx& aMetadata) = 0;
 	virtual const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata) = 0;
 	virtual void Delete(const TUint aId) = 0;
 	virtual void DeleteAll() = 0;
@@ -102,6 +103,7 @@ public:
 class Track
 {
 public:
+	static const TUint kMaxUdnBytes = 1024;
 	static const TUint kMaxMetadataBytes = 4096;
 	
 public:
@@ -110,13 +112,13 @@ public:
 	TUint Id() const;
 	bool IsId(const TUint aId) const;
 	
-	const Brn& Udn() const;
-	const Brn& Metadata() const;
+	const Brx& Udn() const;
+	const Brx& Metadata() const;
 	
 private:
 	const TUint iId;
-	const Brn iUdn;
-	const Brn iMetadata;
+	const Bws<kMaxUdnBytes> iUdn;
+	const Bws<kMaxMetadataBytes> iMetadata;
 };
 
 class PlaylistData : public IPlaylistData
@@ -132,6 +134,7 @@ public:
 	
 	void IdArray(Bwx& aIdArray);
 	
+	virtual void Read(const TUint aTrackId, Bwx& aMetadata);
 	const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
 	void Delete(const TUint aId);
 	void DeleteAll();
@@ -190,6 +193,7 @@ public:
 	
 	virtual void IdArray(Bwx& aIdArray);
 	
+	virtual void Read(const TUint aTrackId, Bwx& aMetadata);
 	virtual const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
 	virtual void Delete(const TUint aId);
 	virtual void DeleteAll();
@@ -212,17 +216,22 @@ private:
 	
 	
 
-class PlaylistManager : public INameable
+class PlaylistManager : public INameable, public IPlaylistManagerListener
 {	
 public:
 	static const TUint kMaxNameBytes = 30;
 	static const TUint kMaxImageBytes = 30 * 1024;
 	static const TUint kMaxMimeTypeBytes = 100;
+	static const TUint kMaxMetadataBytes = 1024;
 	static const TUint kMaxPlaylists = 500;
 	
 public:
     PlaylistManager(OpenHome::Net::DvDevice& aDevice, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
 	virtual ~PlaylistManager();
+	
+	virtual void MetadataChanged();
+	virtual void PlaylistsChanged();
+	virtual void PlaylistChanged();
 	
 	virtual void SetName(const Brx& aValue);
 	
@@ -243,6 +252,8 @@ public:
 	void PlaylistDelete(const TUint aId);
 	
 	void IdArray(const TUint aId, Bwx& aIdArray);
+	
+	void Read(const TUint aId, const TUint aTrackId, Bwx& aMetadata);
 	const TUint Insert(const TUint aId, const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
 	void Delete(const TUint aId, const TUint aTrackId);
 	void DeleteAll(const TUint aId);
@@ -252,8 +263,6 @@ private:
 	void WritePlaylist(Playlist& aPlaylist) const;
 	
 	PlaylistData* CachePlaylist(const TUint aId);
-	
-	void UpdateArrays();
 	
 	mutable Mutex iMutex;
 	
