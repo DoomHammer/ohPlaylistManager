@@ -426,6 +426,22 @@ void PlaylistManagerPersistFs::Delete(const Playlist& aPlaylist)
 {
 }*/
 
+void Metadata::Condense(const Brx& aIn, Bwx& aOut)
+{
+	if(aIn.Bytes() > Track::kMaxMetadataBytes)
+	{
+		aOut.Append(Brn("<DIDL-Lite xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\"><item id=\"\" parentID=\"\" restricted=\"True\"><dc:title>"));
+		aOut.Append(Brn("Metadata too large"));
+		aOut.Append(Brn("</dc:title><upnp:class>object.item</upnp:class></item></DIDL-Lite>"));
+	}
+	else
+	{
+		aOut.Append(aIn);
+	}
+}
+
+
+
 IdGenerator::IdGenerator(const TUint aNextId)
 : iNextId(aNextId)
 {
@@ -683,7 +699,10 @@ const TUint PlaylistData::Insert(const TUint aAfterId, const Brx& aUdn, const Br
     }
 	
 	TUint id = iIdGenerator.NewId();
-    iTracks.insert(i, new Track(id, aUdn, aMetadata));
+	Bws<Track::kMaxMetadataBytes> metadata;
+	
+	Metadata::Condense(aMetadata, metadata);
+    iTracks.insert(i, new Track(id, aUdn, metadata));
 
 	return id;
 }
@@ -1166,12 +1185,13 @@ const TUint PlaylistManager::PlaylistInsert(const TUint aAfterId, const Brx& aNa
 	
 	Playlist* playlist = new Playlist(&iCache, id, filename, aName, aDescription, aImageId);
 	iPlaylists.insert(i, playlist);
-	PlaylistsChanged();
 	
 	WriteToc();
 	WritePlaylist(*playlist);
 	
 	iMutex.Signal();
+	
+	PlaylistsChanged();
 	
 	return id;
 }
@@ -1186,12 +1206,12 @@ void PlaylistManager::PlaylistDelete(const TUint aId)
         return;
     }
 	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
-	if(i == iPlaylists.end()) {
+	if(i == iPlaylists.end())
+	{
 		iMutex.Signal();
 		return;
 	}
 	iPlaylists.erase(i);
-	PlaylistsChanged();
 	
 	try
 	{
@@ -1205,6 +1225,8 @@ void PlaylistManager::PlaylistDelete(const TUint aId)
 	}
 	
 	iMutex.Signal();
+	
+	PlaylistsChanged();
 }
 
 void PlaylistManager::IdArray(const TUint aId, Bwx& aIdArray)
@@ -1218,7 +1240,8 @@ void PlaylistManager::IdArray(const TUint aId, Bwx& aIdArray)
     }
 	
 	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
-	if(i == iPlaylists.end()) {
+	if(i == iPlaylists.end())
+	{
 		iMutex.Signal();
 		THROW(PlaylistManagerError);
 	}
@@ -1233,7 +1256,8 @@ void PlaylistManager::Read(const TUint aId, const TUint aTrackId, Bwx& aMetadata
 	iMutex.Wait();
 	
 	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
-	if(i == iPlaylists.end()) {
+	if(i == iPlaylists.end())
+	{
 		iMutex.Signal();
 		THROW(PlaylistManagerError);
 	}
@@ -1256,7 +1280,8 @@ const TUint PlaylistManager::Insert(const TUint aId, const TUint aAfterId, const
 	iMutex.Wait();
 	
 	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
-	if(i == iPlaylists.end()) {
+	if(i == iPlaylists.end())
+	{
 		iMutex.Signal();
 		THROW(PlaylistManagerError);
 	}
@@ -1264,11 +1289,12 @@ const TUint PlaylistManager::Insert(const TUint aId, const TUint aAfterId, const
 	try
 	{
 		const TUint newId = (*i)->Insert(aAfterId, aUdn, aMetadata);
-		PlaylistChanged();
 		
 		WritePlaylist(*(*i));
 		
 		iMutex.Signal();
+		
+		PlaylistChanged();
 		
 		return newId;
 	}
@@ -1289,17 +1315,19 @@ void PlaylistManager::Delete(const TUint aId, const TUint aTrackId)
 	iMutex.Wait();
 	
 	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
-	if(i == iPlaylists.end()) {
+	if(i == iPlaylists.end())
+	{
 		iMutex.Signal();
 		THROW(PlaylistManagerError);
 	}
 	
 	(*i)->Delete(aTrackId);
-	PlaylistChanged();
 	
 	WritePlaylist(*(*i));
 	
 	iMutex.Signal();
+	
+	PlaylistChanged();
 }
 
 void PlaylistManager::DeleteAll(const TUint aId)
@@ -1307,17 +1335,19 @@ void PlaylistManager::DeleteAll(const TUint aId)
 	iMutex.Wait();
 	
 	list<Playlist*>::iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
-	if(i == iPlaylists.end()) {
+	if(i == iPlaylists.end())
+	{
 		iMutex.Signal();
 		THROW(PlaylistManagerError);
 	}
 	
 	(*i)->DeleteAll();
-	PlaylistChanged();
 	
 	WritePlaylist(*(*i));
 	
 	iMutex.Signal();
+	
+	PlaylistChanged();
 }
 
 void PlaylistManager::WriteToc() const

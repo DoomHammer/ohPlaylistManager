@@ -43,6 +43,14 @@ private:
 	
 	
 	
+class Metadata
+{
+public:
+	static void Condense(const Brx& aIn, Bwx& aOut);
+};
+	
+	
+	
 class IPlaylistHeader
 {
 public:
