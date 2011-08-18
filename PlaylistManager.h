@@ -7,16 +7,11 @@
 #include <OpenHome/Buffer.h>
 #include <OpenHome/Private/Thread.h>
 #include <OpenHome/Net/Core/DvDevice.h>
+#include <OpenHome/Net/Core/DvAvOpenhomeOrgPlaylistManager1.h>
 
 EXCEPTION(PlaylistManagerError);
 EXCEPTION(PlaylistError);
 EXCEPTION(PlaylistFull);
-
-namespace OpenHome {
-namespace Net {
-	class ProviderPlaylistManager;
-}
-}
 
 namespace OpenHome {
 namespace Media {
@@ -252,6 +247,8 @@ public:
     PlaylistManager(OpenHome::Net::DvDevice& aDevice, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType);
 	virtual ~PlaylistManager();
 	
+	void SetListener(IPlaylistManagerListener& aListener);
+	
 	virtual void MetadataChanged();
 	virtual void PlaylistsChanged();
 	virtual void PlaylistChanged();
@@ -289,11 +286,10 @@ private:
 	void WriteToc() const;
 	void WritePlaylist(Playlist& aPlaylist) const;
 	
-	PlaylistData* CachePlaylist(const TUint aId);
-	
 	mutable Mutex iMutex;
 	
 	OpenHome::Net::DvDevice& iDevice;
+	IPlaylistManagerListener* iListener;
 	
 	IdGenerator iIdGenerator;
 	Cache iCache;
@@ -305,8 +301,6 @@ private:
 	
 	std::list<Playlist*> iPlaylists;
 	TUint iToken;
-	
-	OpenHome::Net::ProviderPlaylistManager* iProvider;
 };
 	
 
@@ -339,6 +333,55 @@ private:
 
 } // namespace Media
 } // namespace OpenHome
+
+namespace OpenHome {
+namespace Net {
+	
+	class ProviderPlaylistManager : public DvProviderAvOpenhomeOrgPlaylistManager1, public OpenHome::Media::IPlaylistManagerListener
+	{
+		static const TUint kMaxNameBytes = 60;
+		
+	public:
+		ProviderPlaylistManager(DvDevice& aDevice, OpenHome::Media::PlaylistManager& aPlaylistManager, const TUint aMaxPlaylistCount, const TUint aMaxTrackCount);
+		~ProviderPlaylistManager() {}
+		
+		virtual void MetadataChanged();
+		virtual void PlaylistsChanged();
+		virtual void PlaylistChanged();
+		
+	private:
+		virtual void Metadata(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseString& aMetadata);
+		virtual void ImagesXml(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseString& aImagesXml);
+		virtual void PlaylistReadArray(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseBinary& aArray);
+		virtual void PlaylistReadList(IInvocationResponse& aResponse, TUint aVersion, const Brx& aIdList, IInvocationResponseString& aPlaylistList);
+		virtual void PlaylistRead(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseString& aName, IInvocationResponseString& aDescription, IInvocationResponseUint& aImageId);
+		virtual void PlaylistSetName(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aName);
+		virtual void PlaylistSetDescription(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aDescription);
+		virtual void PlaylistSetImageId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aImageId);
+		virtual void PlaylistInsert(IInvocationResponse& aResponse, TUint aVersion, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IInvocationResponseUint& aNewId);
+		virtual void PlaylistDeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aValue);
+		virtual void PlaylistMove(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterId);
+		virtual void PlaylistsMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
+		virtual void TracksMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
+		virtual void PlaylistArrays(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aToken, IInvocationResponseBinary& aIdArray, IInvocationResponseBinary& aTokenArray);
+		virtual void PlaylistArraysChanged(IInvocationResponse& aResponse, TUint aVersion, TUint aToken, IInvocationResponseBool& aValue);
+		virtual void Read(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId, IInvocationResponseString& aMetadata);
+		virtual void ReadList(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aTrackIdList, IInvocationResponseString& aTrackList);
+		virtual void Insert(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IInvocationResponseUint& aNewTrackId);
+		virtual void DeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId);
+		virtual void DeleteAll(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId);
+		
+		void UpdateMetadata();
+		void UpdateIdArray();
+		void UpdateTokenArray();
+		void UpdateArrays();
+		
+		OpenHome::Media::PlaylistManager& iPlaylistManager;
+	};
+	
+} // namespace Net
+} // namespace OpenHome
+
 
 #endif // HEADER_PLAYLISTMANAGER
 

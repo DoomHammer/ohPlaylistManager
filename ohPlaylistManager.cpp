@@ -114,6 +114,8 @@ int CDECL main(int aArgc, char* aArgv[])
 	// create managers
 	
 	PlaylistManager* playlistManager = new PlaylistManager(*device, adapter, name, icon, Brx::Empty());
+	ProviderPlaylistManager iProvider(*device, *playlistManager, PlaylistManager::kMaxPlaylists, PlaylistData::kMaxTracks);
+	playlistManager->SetListener(iProvider);
     
     device->SetEnabled();
 

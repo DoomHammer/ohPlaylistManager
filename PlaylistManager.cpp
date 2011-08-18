@@ -5,7 +5,6 @@
 #include <OpenHome/Private/Parser.h>
 #include <OpenHome/Private/Ascii.h>
 #include <OpenHome/Private/Converter.h>
-#include <OpenHome/Net/Core/DvAvOpenhomeOrgPlaylistManager1.h>
 
 #include "PlaylistManager.h"
 #include "Stream.h"
@@ -17,63 +16,14 @@
 using namespace std;
 using namespace OpenHome;
 using namespace OpenHome::Media;
-
-namespace OpenHome {
-namespace Net {
-	
-	static const TInt kIdNotFound = 800;
-	static const Brn kIdNotFoundMsg("Id not found");
-	static const TInt kPlaylistFull = 801;
-	static const Brn kPlaylistFullMsg("Playlist full");
-	static const TInt kInvalidRequest = 802;
-	static const Brn kInvalidRequestMsg("Space separated id request list invalid");
-	
-	class ProviderPlaylistManager : public DvProviderAvOpenhomeOrgPlaylistManager1, IPlaylistManagerListener
-	{
-		static const TUint kMaxNameBytes = 60;
-		
-	public:
-		ProviderPlaylistManager(DvDevice& aDevice, PlaylistManager& aPlaylistManager, const TUint aMaxPlaylistCount, const TUint aMaxTrackCount);
-		~ProviderPlaylistManager() {}
-		
-		virtual void MetadataChanged();
-		virtual void PlaylistsChanged();
-		virtual void PlaylistChanged();
-		
-	private:
-		virtual void Metadata(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseString& aMetadata);
-		virtual void ImagesXml(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseString& aImagesXml);
-		virtual void PlaylistReadArray(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseBinary& aArray);
-		virtual void PlaylistReadList(IInvocationResponse& aResponse, TUint aVersion, const Brx& aIdList, IInvocationResponseString& aPlaylistList);
-		virtual void PlaylistRead(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseString& aName, IInvocationResponseString& aDescription, IInvocationResponseUint& aImageId);
-		virtual void PlaylistSetName(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aName);
-		virtual void PlaylistSetDescription(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aDescription);
-		virtual void PlaylistSetImageId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aImageId);
-		virtual void PlaylistInsert(IInvocationResponse& aResponse, TUint aVersion, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IInvocationResponseUint& aNewId);
-		virtual void PlaylistDeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aValue);
-		virtual void PlaylistMove(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterId);
-		virtual void PlaylistsMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
-		virtual void TracksMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
-		virtual void PlaylistArrays(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aToken, IInvocationResponseBinary& aIdArray, IInvocationResponseBinary& aTokenArray);
-		virtual void PlaylistArraysChanged(IInvocationResponse& aResponse, TUint aVersion, TUint aToken, IInvocationResponseBool& aValue);
-		virtual void Read(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId, IInvocationResponseString& aMetadata);
-		virtual void ReadList(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aTrackIdList, IInvocationResponseString& aTrackList);
-		virtual void Insert(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IInvocationResponseUint& aNewTrackId);
-		virtual void DeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId);
-		virtual void DeleteAll(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId);
-		
-		void UpdateMetadata();
-		void UpdateIdArray();
-		void UpdateTokenArray();
-		void UpdateArrays();
-		
-		PlaylistManager& iPlaylistManager;
-	};
-} // Net
-} // OpenHome
-
-using namespace OpenHome;
 using namespace OpenHome::Net;
+
+static const TInt kIdNotFound = 800;
+static const Brn kIdNotFoundMsg("Id not found");
+static const TInt kPlaylistFull = 801;
+static const Brn kPlaylistFullMsg("Playlist full");
+static const TInt kInvalidRequest = 802;
+static const Brn kInvalidRequestMsg("Space separated id request list invalid");
 
 ProviderPlaylistManager::ProviderPlaylistManager(DvDevice& aDevice, PlaylistManager& aPlaylistManager, const TUint aMaxPlaylistCount, const TUint aMaxTrackCount)
 	: DvProviderAvOpenhomeOrgPlaylistManager1(aDevice)
@@ -1111,22 +1061,23 @@ PlaylistManager::PlaylistManager(DvDevice& aDevice, const TIpAddress& aAdapter, 
 	catch(ReaderFileError)
 	{
 	}
-	
-	iProvider = new ProviderPlaylistManager(aDevice, *this, kMaxPlaylists, PlaylistData::kMaxTracks);
-	
-	MetadataChanged();
-	PlaylistsChanged();
-	PlaylistChanged();
 }
 
 PlaylistManager::~PlaylistManager()
 {
-	delete iProvider;
-	
 	for(list<Playlist*>::iterator i = iPlaylists.begin(); i != iPlaylists.end(); ++i)
 	{
 		delete *i;
 	}
+}
+
+void PlaylistManager::SetListener(IPlaylistManagerListener& aListener)
+{
+	iListener = &aListener;
+	
+	MetadataChanged();
+	PlaylistsChanged();
+	PlaylistChanged();
 }
 
 void PlaylistManager::SetName(const Brx& aValue)
@@ -1193,19 +1144,19 @@ void PlaylistManager::Metadata(Bwx& aMetadata) const
 
 void PlaylistManager::MetadataChanged()
 {
-	iProvider->MetadataChanged();
+	iListener->MetadataChanged();
 }
 
 void PlaylistManager::PlaylistsChanged()
 {
 	++iToken;
-	iProvider->PlaylistsChanged();
+	iListener->PlaylistsChanged();
 }
 
 void PlaylistManager::PlaylistChanged()
 {
 	++iToken;
-	iProvider->PlaylistChanged();
+	iListener->PlaylistChanged();
 }
 
 void PlaylistManager::IdArray(Bwx& aIdArray) const
