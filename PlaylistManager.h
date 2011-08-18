@@ -55,9 +55,13 @@ class IPlaylistHeader
 {
 public:
 	virtual const Brx& Filename() const = 0;
-	virtual const Brx& Name() const = 0;
-	virtual const Brx& Description() const = 0;
-	virtual TUint ImageId() const = 0;
+	virtual void Name(Bwx& aName) const = 0;
+	virtual void Description(Bwx& aDescription) const = 0;
+	virtual void ImageId(TUint& aImageId) const = 0;
+	
+	virtual void SetName(const Brx& aName) = 0;
+	virtual void SetDescription(const Brx& aDescription) = 0;
+	virtual void SetImageId(const TUint& aImageId) = 0;
 };
 
 
@@ -86,9 +90,13 @@ public:
 	PlaylistHeader(const Brx& aFilename, IReader& aReader);
 	
 	virtual const Brx& Filename() const;
-	virtual const Brx& Name() const;
-	virtual const Brx& Description() const;
-	virtual TUint ImageId() const;
+	virtual void Name(Bwx& aName) const;
+	virtual void Description(Bwx& aDescription) const;
+	virtual void ImageId(TUint& aImageId) const;
+	
+	virtual void SetName(const Brx& aName);
+	virtual void SetDescription(const Brx& aDescription);
+	virtual void SetImageId(const TUint& aImageId);
 	
 	void ToXml(IWriter& aWriter) const;
 	
@@ -171,9 +179,12 @@ class Playlist;
 class Cache
 {
 public:
+	static const TUint kMaxCacheSize = 1000;
+	
+public:
 	Cache();
 	
-	PlaylistData* Data(const Playlist& aPlaylist, ICacheListener* aCacheListener);
+	PlaylistData& Data(const Playlist& aPlaylist, ICacheListener* aCacheListener);
 	
 private:
 	
@@ -195,9 +206,13 @@ public:
 	const TUint Token() const;
 	
 	virtual const Brx& Filename() const;
-	virtual const Brx& Name() const;
-	virtual const Brx& Description() const;
-	virtual TUint ImageId() const;
+	virtual void Name(Bwx& aName) const;
+	virtual void Description(Bwx& aDescription) const;
+	virtual void ImageId(TUint& aImageId) const;
+	
+	virtual void SetName(const Brx& aName);
+	virtual void SetDescription(const Brx& aDescription);
+	virtual void SetImageId(const TUint& aImageId);
 	
 	virtual void IdArray(Bwx& aIdArray);
 	
@@ -254,10 +269,14 @@ public:
 	void Metadata(Bwx& aMetadata) const;
 	void IdArray(Bwx& aIdArray) const;
 	void TokenArray(Bwx& aTokenArray) const;
-	void PlaylistReadMetadata(std::vector<TUint>& aIdList, IWriter& aWriter) const;
+	void PlaylistReadList(std::vector<TUint>& aIdList, IWriter& aWriter) const;
 	void PlaylistRead(const TUint aId, Bwx& aName, Bwx& aDescription, TUint& aImageId) const;
+	void PlaylistSetName(const TUint aId, const Brx& aName);
+	void PlaylistSetDescription(const TUint aId, const Brx& aDescription);
+	void PlaylistSetImageId(const TUint aId, TUint& aImageId);
 	const TUint PlaylistInsert(const TUint aAfterId, const Brx& aName, const Brx& aDescription, const TUint aImageId);
 	void PlaylistDelete(const TUint aId);
+	void PlaylistMove(const TUint aId, const TUint aAfterId);
 	
 	void IdArray(const TUint aId, Bwx& aIdArray);
 	

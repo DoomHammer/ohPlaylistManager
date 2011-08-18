@@ -36,7 +36,7 @@ void ReaderFile::Read(Bwx& aBuffer)
 	int count = fread((void*)aBuffer.Ptr(), 1, aBuffer.MaxBytes(), iFile);
 	aBuffer.SetBytes(count);
 	
-	if(count < 0)
+	if(count < 1)
 	{
 		THROW(ReaderFileError);
 	}
@@ -44,6 +44,12 @@ void ReaderFile::Read(Bwx& aBuffer)
 
 void ReaderFile::ReadFlush()
 {
+	if(iFile == NULL)
+	{
+		THROW(ReaderFileError);
+	}
+	
+	fflush(iFile);
 }
 
 void ReaderFile::ReadInterrupt()
@@ -96,5 +102,10 @@ void WriterFile::Write(const Brx& aBuffer)
 
 void WriterFile::WriteFlush()
 {
+	if(iFile == NULL)
+	{
+		THROW(WriterFileError);
+	}
 	
+	fflush(iFile);
 }
