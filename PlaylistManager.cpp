@@ -511,8 +511,8 @@ PlaylistData& Cache::Data(const Playlist& aPlaylist, ICacheListener* aCacheListe
 
 
 PlaylistHeader::PlaylistHeader(const Brx& aFilename, const Brx& aName, const Brx& aDescription, const TUint aImageId)
-	: iName(aName)
-	, iFilename(aFilename)
+	: iFilename(aFilename)
+    ,iName(aName)
 	, iDescription(aDescription)
 	, iImageId(aImageId)
 {
@@ -791,20 +791,20 @@ void PlaylistData::ToXml(IWriter& aWriter) const
 
 
 Playlist::Playlist(Cache* aCache, const TUint aId, const Brx& aFilename, const Brx& aName, const Brx& aDescription, const TUint aImageId)
-	: iCache(aCache)
+	: iMutex("PList")
 	, iId(aId)
 	, iToken(0)
-	, iMutex("PList")
+    , iCache(aCache)
 	, iHeader(aFilename, aName, aDescription, aImageId)
 	, iData(0)
 {
 }
 
 Playlist::Playlist(Cache* aCache, const TUint aId, const Brx& aFilename, IReader& aReader)
-	: iCache(aCache)
+	: iMutex("PList")
 	, iId(aId)
 	, iToken(0)
-	, iMutex("PList")
+    , iCache(aCache)
 	, iHeader(aFilename, aReader)
 	, iData(0)
 {
@@ -1012,13 +1012,13 @@ void Playlist::RemovedFromCache()
 
 
 PlaylistManager::PlaylistManager(DvDevice& aDevice, const TIpAddress& aAdapter, const Brx& aName, const Brx& aImage, const Brx& aMimeType)
-	: iDevice(aDevice)
+	: iMutex("PMngr")
+    , iDevice(aDevice)
+    , iName(aName)
+    , iAdapter(aAdapter)
 	, iImage(aImage)
 	, iMimeType(aMimeType)
-	, iName(aName)
-	, iAdapter(aAdapter)
 	, iToken(0)
-	, iMutex("PMngr")
 {
 	try 
 	{
@@ -1027,7 +1027,7 @@ PlaylistManager::PlaylistManager(DvDevice& aDevice, const TIpAddress& aAdapter, 
 		
 		TUint lastId = 0;
 		TUint count = Ascii::Uint(tocReader.ReadUntil('\n'));
-		for(int i = 0; i < count; ++i)
+		for(TUint i = 0; i < count; ++i)
 		{
 			const Brn name = tocReader.ReadUntil('\n');
 			ReaderBuffer nameReader;
