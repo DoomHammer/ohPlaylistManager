@@ -1,5 +1,6 @@
 #include "Stream.h"
 
+using namespace OpenHome;
 using namespace OpenHome::Media;
 
 ReaderFile::ReaderFile(const TChar* aFilename)
