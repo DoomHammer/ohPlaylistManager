@@ -51,7 +51,7 @@ all: all_common
 # Include rules to build platform independent code
 include Common.mak
 
-$(objects_songcast) : make_obj_dir
+$(objects_playlistManager) : make_obj_dir
 
 make_obj_dir : $(objdirbare)
 
