@@ -66,7 +66,7 @@ class IPlaylistData
 public:
 	virtual void IdArray(Bwx& aIdArray) = 0;
 	
-	virtual void Read(const TUint aTrackId, Bwx& aMetadata) = 0;
+	virtual void Read(const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata) = 0;
 	virtual const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata) = 0;
 	virtual void Delete(const TUint aId) = 0;
 	virtual void DeleteAll() = 0;
@@ -145,7 +145,7 @@ public:
 	
 	void IdArray(Bwx& aIdArray);
 	
-	virtual void Read(const TUint aTrackId, Bwx& aMetadata);
+	virtual void Read(const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
 	const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
 	void Delete(const TUint aId);
 	void DeleteAll();
@@ -211,7 +211,7 @@ public:
 	
 	virtual void IdArray(Bwx& aIdArray);
 	
-	virtual void Read(const TUint aTrackId, Bwx& aMetadata);
+	virtual void Read(const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
 	virtual const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
 	virtual void Delete(const TUint aId);
 	virtual void DeleteAll();
@@ -263,6 +263,7 @@ public:
 	const TUint Token() const;
 	const TBool TokenChanged(const TUint aToken) const;
 	
+	void ImagesXml(IWriter& aWriter) const;
 	void Metadata(Bwx& aMetadata) const;
 	void IdArray(Bwx& aIdArray) const;
 	void TokenArray(Bwx& aTokenArray) const;
@@ -277,7 +278,8 @@ public:
 	
 	void IdArray(const TUint aId, Bwx& aIdArray);
 	
-	void Read(const TUint aId, const TUint aTrackId, Bwx& aMetadata);
+	void Read(const TUint aId, const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
+	void ReadList(const TUint aId, std::vector<TUint>& aIdList, IWriter& aWriter);
 	const TUint Insert(const TUint aId, const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
 	void Delete(const TUint aId, const TUint aTrackId);
 	void DeleteAll(const TUint aId);
@@ -365,7 +367,7 @@ namespace Net {
 		virtual void TracksMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
 		virtual void PlaylistArrays(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aToken, IInvocationResponseBinary& aIdArray, IInvocationResponseBinary& aTokenArray);
 		virtual void PlaylistArraysChanged(IInvocationResponse& aResponse, TUint aVersion, TUint aToken, IInvocationResponseBool& aValue);
-		virtual void Read(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId, IInvocationResponseString& aMetadata);
+		virtual void Read(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId, IInvocationResponseString& aUdn, IInvocationResponseString& aMetadata);
 		virtual void ReadList(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aTrackIdList, IInvocationResponseString& aTrackList);
 		virtual void Insert(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IInvocationResponseUint& aNewTrackId);
 		virtual void DeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId);
