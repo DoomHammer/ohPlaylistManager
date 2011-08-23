@@ -278,6 +278,7 @@ public:
 	
 	void IdArray(const TUint aId, Bwx& aIdArray);
 	
+	bool PlaylistExists(const TUint aId) const;
 	void Read(const TUint aId, const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
 	void ReadList(const TUint aId, std::vector<TUint>& aIdList, IWriter& aWriter);
 	const TUint Insert(const TUint aId, const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);

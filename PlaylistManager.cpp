@@ -341,9 +341,17 @@ void ProviderPlaylistManager::ReadList(IInvocationResponse& aResponse, TUint /*a
         aResponse.Error(kInvalidRequest, kInvalidRequestMsg);
     }
 	
-	aResponse.Start();
-	iPlaylistManager.ReadList(aId, v, aTrackList);
-	aResponse.End();
+	if(iPlaylistManager.PlaylistExists(aId))
+	{
+		aResponse.Start();
+		iPlaylistManager.ReadList(aId, v, aTrackList);
+		aResponse.End();
+	}
+	else
+	{
+		aResponse.Error(kIdNotFound, kIdNotFoundMsg);
+	}
+
 }
 
 void ProviderPlaylistManager::Insert(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IInvocationResponseUint& aNewTrackId)
@@ -1504,6 +1512,22 @@ void PlaylistManager::IdArray(const TUint aId, Bwx& aIdArray)
 	iMutex.Signal();
 }
 
+bool PlaylistManager::PlaylistExists(const TUint aId) const
+{
+	iMutex.Wait();
+	
+	list<Playlist*>::const_iterator i = find_if(iPlaylists.begin(), iPlaylists.end(), bind2nd(mem_fun(&Playlist::IsId), aId));
+	if(i == iPlaylists.end())
+	{
+		iMutex.Signal();
+		return false;
+	}
+	
+	iMutex.Signal();
+	
+	return true;
+}
+
 void PlaylistManager::Read(const TUint aId, const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata)
 {
 	iMutex.Wait();
@@ -1621,7 +1645,7 @@ void PlaylistManager::Delete(const TUint aId, const TUint aTrackId)
 	if(i == iPlaylists.end())
 	{
 		iMutex.Signal();
-		THROW(PlaylistManagerError);
+		return;
 	}
 	
 	(*i)->Delete(aTrackId);
@@ -1641,7 +1665,7 @@ void PlaylistManager::DeleteAll(const TUint aId)
 	if(i == iPlaylists.end())
 	{
 		iMutex.Signal();
-		THROW(PlaylistManagerError);
+		return;
 	}
 	
 	(*i)->DeleteAll();
