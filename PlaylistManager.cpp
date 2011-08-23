@@ -671,7 +671,7 @@ PlaylistData::PlaylistData(const TUint aId, const Brx& aFilename)
 	try
 	{
 		// skip over header information
-		while(true)
+		for(;;)
 		{
 			reader.ReadUntil('<');
 			if(reader.ReadUntil('>') == Brn("/ImageId"))
@@ -684,7 +684,7 @@ PlaylistData::PlaylistData(const TUint aId, const Brx& aFilename)
 		Brn udnTag("Udn");
 		Brn metadataTag("Metadata");
 		
-		while(true)
+		for(;;)
 		{
 			reader.ReadUntil('<');								// beginning of <Track>
 			if(reader.ReadUntil('>') == trackTag)				// end of <Track>

@@ -340,10 +340,8 @@ private:
 namespace OpenHome {
 namespace Net {
 	
-	class ProviderPlaylistManager : public DvProviderAvOpenhomeOrgPlaylistManager1, public OpenHome::Media::IPlaylistManagerListener
+	class ProviderPlaylistManager : public DvProviderAvOpenhomeOrgPlaylistManager1, public OpenHome::Media::IPlaylistManagerListener, public INonCopyable
 	{
-		static const TUint kMaxNameBytes = 60;
-		
 	public:
 		ProviderPlaylistManager(DvDevice& aDevice, OpenHome::Media::PlaylistManager& aPlaylistManager, const TUint aMaxPlaylistCount, const TUint aMaxTrackCount);
 		~ProviderPlaylistManager() {}
