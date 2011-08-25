@@ -237,7 +237,7 @@ private:
 class PlaylistManager : public INameable, public IPlaylistManagerListener
 {	
 public:
-	static const TUint kMaxNameBytes = 30;
+	static const TUint kMaxNameBytes = 100;
 	static const TUint kMaxImageBytes = 30 * 1024;
 	static const TUint kMaxMimeTypeBytes = 100;
 	static const TUint kMaxMetadataBytes = 1024;

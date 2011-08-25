@@ -28,6 +28,18 @@ int mygetch()
     return (_getch());
 }
 
+void ComputerName(Bwx& aName)
+{
+	TUint bytes = aName.MaxBytes();
+	
+	if(!GetComputerName((LPSTR)aName.Ptr(), (LPDWORD)&bytes))
+	{
+		THROW(PlaylistManagerError);
+	}
+	
+	aName.SetBytes(bytes);
+}
+
 #else
 
 #define CDECL
@@ -48,6 +60,36 @@ int mygetch()
 	return ch;
 }
 
+#include <sys/utsname.h>
+
+void ComputerName(Bwx& aName)
+{
+	struct utsname name;
+	if(uname(&name) < 0)
+	{
+		return;
+	}
+	
+	// strip off the ".local" from the end
+	Brn computer(name.nodename);
+	Brn local(".local");
+	if(computer.Bytes() > local.Bytes())
+	{
+		Brn end = computer.Split(computer.Bytes() - local.Bytes());
+		if(Ascii::CaseInsensitiveEquals(end, local))
+		{
+			computer.Set(computer.Ptr(), computer.Bytes() - local.Bytes());
+		}
+	}
+	
+	if(computer.Bytes() > aName.MaxBytes())
+	{
+		THROW(PlaylistManagerError);
+	}
+	
+	aName.Replace(computer);
+}
+
 #endif
 
 
@@ -65,7 +107,14 @@ int CDECL main(int aArgc, char* aArgv[])
 {
     OptionParser parser;
     
-    OptionString optionName("-n", "--name", Brn("ohPlaylistManager"), "[name] name of the playlist manager");
+	Bws<PlaylistManager::kMaxNameBytes - 20> computerName;
+	ComputerName(computerName);
+	
+	Bws<PlaylistManager::kMaxNameBytes> defaultName("ohPlaylistManager (");
+	defaultName.Append(computerName);
+	defaultName.Append(Brn(")"));
+	
+    OptionString optionName("-n", "--name", defaultName, "[name] name of the playlist manager");
     parser.AddOption(&optionName);
 	
 	OptionUint optionAdapter("-a", "--adapter", 0, "[adapter] index of network adapter to use");
