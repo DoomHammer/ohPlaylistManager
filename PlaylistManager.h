@@ -351,26 +351,26 @@ namespace Net {
 		virtual void PlaylistChanged();
 		
 	private:
-		virtual void Metadata(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseString& aMetadata);
-		virtual void ImagesXml(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseString& aImagesXml);
-		virtual void PlaylistReadArray(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseBinary& aArray);
-		virtual void PlaylistReadList(IInvocationResponse& aResponse, TUint aVersion, const Brx& aIdList, IInvocationResponseString& aPlaylistList);
-		virtual void PlaylistRead(IInvocationResponse& aResponse, TUint aVersion, TUint aId, IInvocationResponseString& aName, IInvocationResponseString& aDescription, IInvocationResponseUint& aImageId);
-		virtual void PlaylistSetName(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aName);
-		virtual void PlaylistSetDescription(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aDescription);
-		virtual void PlaylistSetImageId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aImageId);
-		virtual void PlaylistInsert(IInvocationResponse& aResponse, TUint aVersion, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IInvocationResponseUint& aNewId);
-		virtual void PlaylistDeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aValue);
-		virtual void PlaylistMove(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterId);
-		virtual void PlaylistsMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
-		virtual void TracksMax(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aValue);
-		virtual void PlaylistArrays(IInvocationResponse& aResponse, TUint aVersion, IInvocationResponseUint& aToken, IInvocationResponseBinary& aIdArray, IInvocationResponseBinary& aTokenArray);
-		virtual void PlaylistArraysChanged(IInvocationResponse& aResponse, TUint aVersion, TUint aToken, IInvocationResponseBool& aValue);
-		virtual void Read(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId, IInvocationResponseString& aUdn, IInvocationResponseString& aMetadata);
-		virtual void ReadList(IInvocationResponse& aResponse, TUint aVersion, TUint aId, const Brx& aTrackIdList, IInvocationResponseString& aTrackList);
-		virtual void Insert(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IInvocationResponseUint& aNewTrackId);
-		virtual void DeleteId(IInvocationResponse& aResponse, TUint aVersion, TUint aId, TUint aTrackId);
-		virtual void DeleteAll(IInvocationResponse& aResponse, TUint aVersion, TUint aTrackId);
+		virtual void Metadata(IDvInvocation& aResponse, IDvInvocationResponseString& aMetadata);
+		virtual void ImagesXml(IDvInvocation& aResponse, IDvInvocationResponseString& aImagesXml);
+		virtual void PlaylistReadArray(IDvInvocation& aResponse, TUint aId, IDvInvocationResponseBinary& aArray);
+		virtual void PlaylistReadList(IDvInvocation& aResponse, const Brx& aIdList, IDvInvocationResponseString& aPlaylistList);
+		virtual void PlaylistRead(IDvInvocation& aResponse, TUint aId, IDvInvocationResponseString& aName, IDvInvocationResponseString& aDescription, IDvInvocationResponseUint& aImageId);
+		virtual void PlaylistSetName(IDvInvocation& aResponse, TUint aId, const Brx& aName);
+		virtual void PlaylistSetDescription(IDvInvocation& aResponse, TUint aId, const Brx& aDescription);
+		virtual void PlaylistSetImageId(IDvInvocation& aResponse, TUint aId, TUint aImageId);
+		virtual void PlaylistInsert(IDvInvocation& aResponse, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IDvInvocationResponseUint& aNewId);
+		virtual void PlaylistDeleteId(IDvInvocation& aResponse, TUint aValue);
+		virtual void PlaylistMove(IDvInvocation& aResponse, TUint aId, TUint aAfterId);
+		virtual void PlaylistsMax(IDvInvocation& aResponse, IDvInvocationResponseUint& aValue);
+		virtual void TracksMax(IDvInvocation& aResponse, IDvInvocationResponseUint& aValue);
+		virtual void PlaylistArrays(IDvInvocation& aResponse, IDvInvocationResponseUint& aToken, IDvInvocationResponseBinary& aIdArray, IDvInvocationResponseBinary& aTokenArray);
+		virtual void PlaylistArraysChanged(IDvInvocation& aResponse, TUint aToken, IDvInvocationResponseBool& aValue);
+		virtual void Read(IDvInvocation& aResponse, TUint aId, TUint aTrackId, IDvInvocationResponseString& aUdn, IDvInvocationResponseString& aMetadata);
+		virtual void ReadList(IDvInvocation& aResponse, TUint aId, const Brx& aTrackIdList, IDvInvocationResponseString& aTrackList);
+		virtual void Insert(IDvInvocation& aResponse, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IDvInvocationResponseUint& aNewTrackId);
+		virtual void DeleteId(IDvInvocation& aResponse, TUint aId, TUint aTrackId);
+		virtual void DeleteAll(IDvInvocation& aResponse, TUint aTrackId);
 		
 		void UpdateMetadata();
 		void UpdateIdArray();

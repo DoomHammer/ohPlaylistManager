@@ -57,25 +57,25 @@ ProviderPlaylistManager::ProviderPlaylistManager(DvDevice& aDevice, PlaylistMana
 	UpdateArrays();
 }
 
-void ProviderPlaylistManager::Metadata(IInvocationResponse& aResponse, TUint /*aVersion*/, IInvocationResponseString& aMetadata)
+void ProviderPlaylistManager::Metadata(IDvInvocation& aResponse, IDvInvocationResponseString& aMetadata)
 {
 	Brhz metadata;
 	GetPropertyMetadata(metadata);
 	
-	aResponse.Start();
+	aResponse.StartResponse();
 	aMetadata.Write(metadata);
 	aMetadata.WriteFlush();
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::ImagesXml(IInvocationResponse& aResponse, TUint /*aVersion*/, IInvocationResponseString& aImagesXml)
+void ProviderPlaylistManager::ImagesXml(IDvInvocation& aResponse, IDvInvocationResponseString& aImagesXml)
 {
-	aResponse.Start();
+	aResponse.StartResponse();
 	iPlaylistManager.ImagesXml(aImagesXml);
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::PlaylistReadArray(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, IInvocationResponseBinary& aArray)
+void ProviderPlaylistManager::PlaylistReadArray(IDvInvocation& aResponse, TUint aId, IDvInvocationResponseBinary& aArray)
 {
 	Bws<PlaylistData::kMaxTracks> idArray;
 	
@@ -83,10 +83,10 @@ void ProviderPlaylistManager::PlaylistReadArray(IInvocationResponse& aResponse, 
 	{
 		iPlaylistManager.IdArray(aId, idArray);
 		
-		aResponse.Start();
+		aResponse.StartResponse();
 		aArray.Write(idArray);
 		aArray.WriteFlush();
-		aResponse.End();
+		aResponse.EndResponse();
 	}
 	catch(PlaylistManagerError)
 	{
@@ -94,7 +94,7 @@ void ProviderPlaylistManager::PlaylistReadArray(IInvocationResponse& aResponse, 
 	}
 }
 
-void ProviderPlaylistManager::PlaylistReadList(IInvocationResponse& aResponse, TUint /*aVersion*/, const Brx& aIdList, IInvocationResponseString& aPlaylistList)
+void ProviderPlaylistManager::PlaylistReadList(IDvInvocation& aResponse, const Brx& aIdList, IDvInvocationResponseString& aPlaylistList)
 {
 	TUint playlistsMax;
     GetPropertyPlaylistsMax(playlistsMax);
@@ -118,12 +118,12 @@ void ProviderPlaylistManager::PlaylistReadList(IInvocationResponse& aResponse, T
         aResponse.Error(kInvalidRequest, kInvalidRequestMsg);
     }
 	
-	aResponse.Start();
+	aResponse.StartResponse();
 	iPlaylistManager.PlaylistReadList(v, aPlaylistList);
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::PlaylistRead(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, IInvocationResponseString& aName, IInvocationResponseString& aDescription, IInvocationResponseUint& aImageId)
+void ProviderPlaylistManager::PlaylistRead(IDvInvocation& aResponse, TUint aId, IDvInvocationResponseString& aName, IDvInvocationResponseString& aDescription, IDvInvocationResponseUint& aImageId)
 {
 	Bws<PlaylistHeader::kMaxNameBytes> name;
 	Bws<PlaylistHeader::kMaxDescriptionBytes> description;
@@ -133,7 +133,7 @@ void ProviderPlaylistManager::PlaylistRead(IInvocationResponse& aResponse, TUint
 	{
 		iPlaylistManager.PlaylistRead(aId, name, description, imageId);
 	
-		aResponse.Start();
+		aResponse.StartResponse();
 		
 		aName.Write(name);
 		aName.WriteFlush();
@@ -143,7 +143,7 @@ void ProviderPlaylistManager::PlaylistRead(IInvocationResponse& aResponse, TUint
 		
 		aImageId.Write(imageId);
 		
-		aResponse.End();
+		aResponse.EndResponse();
 	}
 	catch(PlaylistManagerError)
 	{
@@ -151,14 +151,14 @@ void ProviderPlaylistManager::PlaylistRead(IInvocationResponse& aResponse, TUint
 	}
 }
 
-void ProviderPlaylistManager::PlaylistSetName(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, const Brx& aName)
+void ProviderPlaylistManager::PlaylistSetName(IDvInvocation& aResponse, TUint aId, const Brx& aName)
 {
 	try
 	{
 		iPlaylistManager.PlaylistSetName(aId, aName);
 		
-		aResponse.Start();
-		aResponse.End();
+		aResponse.StartResponse();
+		aResponse.EndResponse();
 		
 		UpdateTokenArray();
 	}
@@ -168,14 +168,14 @@ void ProviderPlaylistManager::PlaylistSetName(IInvocationResponse& aResponse, TU
 	}
 }
 
-void ProviderPlaylistManager::PlaylistSetDescription(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, const Brx& aDescription)
+void ProviderPlaylistManager::PlaylistSetDescription(IDvInvocation& aResponse, TUint aId, const Brx& aDescription)
 {
 	try
 	{
 		iPlaylistManager.PlaylistSetDescription(aId, aDescription);
 		
-		aResponse.Start();
-		aResponse.End();
+		aResponse.StartResponse();
+		aResponse.EndResponse();
 		
 		UpdateTokenArray();
 	}
@@ -185,14 +185,14 @@ void ProviderPlaylistManager::PlaylistSetDescription(IInvocationResponse& aRespo
 	}
 }
 
-void ProviderPlaylistManager::PlaylistSetImageId(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, TUint aImageId)
+void ProviderPlaylistManager::PlaylistSetImageId(IDvInvocation& aResponse, TUint aId, TUint aImageId)
 {
 	try
 	{
 		iPlaylistManager.PlaylistSetImageId(aId, aImageId);
 		
-		aResponse.Start();
-		aResponse.End();
+		aResponse.StartResponse();
+		aResponse.EndResponse();
 		
 		UpdateTokenArray();
 	}
@@ -202,15 +202,15 @@ void ProviderPlaylistManager::PlaylistSetImageId(IInvocationResponse& aResponse,
 	}
 }
 
-void ProviderPlaylistManager::PlaylistInsert(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IInvocationResponseUint& aNewId)
+void ProviderPlaylistManager::PlaylistInsert(IDvInvocation& aResponse, TUint aAfterId, const Brx& aName, const Brx& aDescription, TUint aImageId, IDvInvocationResponseUint& aNewId)
 {
 	try
 	{
 		TUint newId = iPlaylistManager.PlaylistInsert(aAfterId, aName, aDescription, aImageId);
 		
-		aResponse.Start();
+		aResponse.StartResponse();
 		aNewId.Write(newId);
-		aResponse.End();
+		aResponse.EndResponse();
 		
 		UpdateArrays();
 	}
@@ -220,24 +220,24 @@ void ProviderPlaylistManager::PlaylistInsert(IInvocationResponse& aResponse, TUi
 	}
 }
 
-void ProviderPlaylistManager::PlaylistDeleteId(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aValue)
+void ProviderPlaylistManager::PlaylistDeleteId(IDvInvocation& aResponse, TUint aValue)
 {
 	iPlaylistManager.PlaylistDelete(aValue);
 	
-	aResponse.Start();
-	aResponse.End();
+	aResponse.StartResponse();
+	aResponse.EndResponse();
 	
 	UpdateArrays();
 }
 
-void ProviderPlaylistManager::PlaylistMove(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, TUint aAfterId)
+void ProviderPlaylistManager::PlaylistMove(IDvInvocation& aResponse, TUint aId, TUint aAfterId)
 {
 	try
 	{
 		iPlaylistManager.PlaylistMove(aId, aAfterId);
 		
-		aResponse.Start();
-		aResponse.End();
+		aResponse.StartResponse();
+		aResponse.EndResponse();
 		
 		UpdateArrays();
 	}
@@ -247,27 +247,27 @@ void ProviderPlaylistManager::PlaylistMove(IInvocationResponse& aResponse, TUint
 	}
 }
 
-void ProviderPlaylistManager::PlaylistsMax(IInvocationResponse& aResponse, TUint /*aVersion*/, IInvocationResponseUint& aValue)
+void ProviderPlaylistManager::PlaylistsMax(IDvInvocation& aResponse, IDvInvocationResponseUint& aValue)
 {
 	TUint count;
 	GetPropertyPlaylistsMax(count);
 	
-	aResponse.Start();
+	aResponse.StartResponse();
 	aValue.Write(count);
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::TracksMax(IInvocationResponse& aResponse, TUint /*aVersion*/, IInvocationResponseUint& aValue)
+void ProviderPlaylistManager::TracksMax(IDvInvocation& aResponse, IDvInvocationResponseUint& aValue)
 {
 	TUint count;
 	GetPropertyTracksMax(count);
 	
-	aResponse.Start();
+	aResponse.StartResponse();
 	aValue.Write(count);
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::PlaylistArrays(IInvocationResponse& aResponse, TUint /*aVersion*/, IInvocationResponseUint& aToken, IInvocationResponseBinary& aIdArray, IInvocationResponseBinary& aTokenArray)
+void ProviderPlaylistManager::PlaylistArrays(IDvInvocation& aResponse, IDvInvocationResponseUint& aToken, IDvInvocationResponseBinary& aIdArray, IDvInvocationResponseBinary& aTokenArray)
 {
 	Brh idArray;
 	GetPropertyIdArray(idArray);
@@ -275,23 +275,23 @@ void ProviderPlaylistManager::PlaylistArrays(IInvocationResponse& aResponse, TUi
 	Brh tokenArray;
 	GetPropertyTokenArray(tokenArray);
 	
-	aResponse.Start();
+	aResponse.StartResponse();
 	aToken.Write(iPlaylistManager.Token());
 	aIdArray.Write(idArray);
 	aIdArray.WriteFlush();
 	aTokenArray.Write(tokenArray);
 	aTokenArray.WriteFlush();
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::PlaylistArraysChanged(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aToken, IInvocationResponseBool& aValue)
+void ProviderPlaylistManager::PlaylistArraysChanged(IDvInvocation& aResponse, TUint aToken, IDvInvocationResponseBool& aValue)
 {
-	aResponse.Start();
+	aResponse.StartResponse();
 	aValue.Write(iPlaylistManager.TokenChanged(aToken));
-	aResponse.End();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::Read(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, TUint aTrackId, IInvocationResponseString& aUdn, IInvocationResponseString& aMetadata)
+void ProviderPlaylistManager::Read(IDvInvocation& aResponse, TUint aId, TUint aTrackId, IDvInvocationResponseString& aUdn, IDvInvocationResponseString& aMetadata)
 {
 	Bws<Track::kMaxUdnBytes> udn;
 	Bws<Track::kMaxMetadataBytes> metadata;
@@ -300,12 +300,12 @@ void ProviderPlaylistManager::Read(IInvocationResponse& aResponse, TUint /*aVers
 	{
 		iPlaylistManager.Read(aId, aTrackId, udn, metadata);
 		
-		aResponse.Start();
+		aResponse.StartResponse();
 		aUdn.Write(udn);
 		aUdn.WriteFlush();
 		aMetadata.Write(metadata);
 		aMetadata.WriteFlush();
-		aResponse.End();
+		aResponse.EndResponse();
 	}
 	catch(PlaylistManagerError)
 	{
@@ -317,7 +317,7 @@ void ProviderPlaylistManager::Read(IInvocationResponse& aResponse, TUint /*aVers
 	}
 }
 
-void ProviderPlaylistManager::ReadList(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, const Brx& aTrackIdList, IInvocationResponseString& aTrackList)
+void ProviderPlaylistManager::ReadList(IDvInvocation& aResponse, TUint aId, const Brx& aTrackIdList, IDvInvocationResponseString& aTrackList)
 {
 	TUint tracksMax;
     GetPropertyTracksMax(tracksMax);
@@ -343,9 +343,9 @@ void ProviderPlaylistManager::ReadList(IInvocationResponse& aResponse, TUint /*a
 	
 	if(iPlaylistManager.PlaylistExists(aId))
 	{
-		aResponse.Start();
+		aResponse.StartResponse();
 		iPlaylistManager.ReadList(aId, v, aTrackList);
-		aResponse.End();
+		aResponse.EndResponse();
 	}
 	else
 	{
@@ -354,15 +354,15 @@ void ProviderPlaylistManager::ReadList(IInvocationResponse& aResponse, TUint /*a
 
 }
 
-void ProviderPlaylistManager::Insert(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IInvocationResponseUint& aNewTrackId)
+void ProviderPlaylistManager::Insert(IDvInvocation& aResponse, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IDvInvocationResponseUint& aNewTrackId)
 {
 	try
 	{
 		const TUint newId = iPlaylistManager.Insert(aId, aAfterTrackId, aUdn, aMetadataId);
 		
-		aResponse.Start();
+		aResponse.StartResponse();
 		aNewTrackId.Write(newId);
-		aResponse.End();
+		aResponse.EndResponse();
 		
 		UpdateArrays();
 	}
@@ -379,20 +379,20 @@ void ProviderPlaylistManager::Insert(IInvocationResponse& aResponse, TUint /*aVe
 		aResponse.Error(kPlaylistFull, kPlaylistFullMsg);
 	}
 }
-void ProviderPlaylistManager::DeleteId(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aId, TUint aTrackId)
+void ProviderPlaylistManager::DeleteId(IDvInvocation& aResponse, TUint aId, TUint aTrackId)
 {
 	iPlaylistManager.Delete(aId, aTrackId);
 	
-	aResponse.Start();
-	aResponse.End();
+	aResponse.StartResponse();
+	aResponse.EndResponse();
 }
 
-void ProviderPlaylistManager::DeleteAll(IInvocationResponse& aResponse, TUint /*aVersion*/, TUint aTrackId)
+void ProviderPlaylistManager::DeleteAll(IDvInvocation& aResponse, TUint aTrackId)
 {
 	iPlaylistManager.DeleteAll(aTrackId);
 	
-	aResponse.Start();
-	aResponse.End();
+	aResponse.StartResponse();
+	aResponse.EndResponse();
 }
 
 void ProviderPlaylistManager::MetadataChanged()
