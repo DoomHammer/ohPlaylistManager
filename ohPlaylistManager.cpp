@@ -28,6 +28,8 @@ int mygetch()
     return (_getch());
 }
 
+#include <Windows.h>
+
 void ComputerName(Bwx& aName)
 {
 	TUint bytes = aName.MaxBytes();
