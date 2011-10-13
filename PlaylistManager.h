@@ -66,8 +66,8 @@ class IPlaylistData
 public:
 	virtual void IdArray(Bwx& aIdArray) = 0;
 	
-	virtual void Read(const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata) = 0;
-	virtual const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata) = 0;
+	virtual void Read(const TUint aTrackId, Bwx& aMetadata) = 0;
+	virtual const TUint Insert(const TUint aAfterId, const Brx& aMetadata) = 0;
 	virtual void Delete(const TUint aId) = 0;
 	virtual void DeleteAll() = 0;
 };
@@ -118,17 +118,15 @@ public:
 	static const TUint kMaxMetadataBytes = 4096;
 	
 public:
-	Track(const TUint aId, const Brx& aUdn, const Brx& aMetadata);
+	Track(const TUint aId, const Brx& aMetadata);
 	
 	TUint Id() const;
 	bool IsId(const TUint aId) const;
 	
-	const Brx& Udn() const;
 	const Brx& Metadata() const;
 	
 private:
 	const TUint iId;
-	const Bws<kMaxUdnBytes> iUdn;
 	const Bws<kMaxMetadataBytes> iMetadata;
 };
 
@@ -145,8 +143,8 @@ public:
 	
 	void IdArray(Bwx& aIdArray);
 	
-	virtual void Read(const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
-	const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
+	virtual void Read(const TUint aTrackId, Bwx& aMetadata);
+	const TUint Insert(const TUint aAfterId, const Brx& aMetadata);
 	void Delete(const TUint aId);
 	void DeleteAll();
 	
@@ -211,8 +209,8 @@ public:
 	
 	virtual void IdArray(Bwx& aIdArray);
 	
-	virtual void Read(const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
-	virtual const TUint Insert(const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
+	virtual void Read(const TUint aTrackId, Bwx& aMetadata);
+	virtual const TUint Insert(const TUint aAfterId, const Brx& aMetadata);
 	virtual void Delete(const TUint aId);
 	virtual void DeleteAll();
 	
@@ -279,9 +277,9 @@ public:
 	void IdArray(const TUint aId, Bwx& aIdArray);
 	
 	bool PlaylistExists(const TUint aId) const;
-	void Read(const TUint aId, const TUint aTrackId, Bwx& aUdn, Bwx& aMetadata);
+	void Read(const TUint aId, const TUint aTrackId, Bwx& aMetadata);
 	void ReadList(const TUint aId, std::vector<TUint>& aIdList, IWriter& aWriter);
-	const TUint Insert(const TUint aId, const TUint aAfterId, const Brx& aUdn, const Brx& aMetadata);
+	const TUint Insert(const TUint aId, const TUint aAfterId, const Brx& aMetadata);
 	void Delete(const TUint aId, const TUint aTrackId);
 	void DeleteAll(const TUint aId);
 
@@ -366,9 +364,9 @@ namespace Net {
 		virtual void TracksMax(IDvInvocation& aResponse, IDvInvocationResponseUint& aValue);
 		virtual void PlaylistArrays(IDvInvocation& aResponse, IDvInvocationResponseUint& aToken, IDvInvocationResponseBinary& aIdArray, IDvInvocationResponseBinary& aTokenArray);
 		virtual void PlaylistArraysChanged(IDvInvocation& aResponse, TUint aToken, IDvInvocationResponseBool& aValue);
-		virtual void Read(IDvInvocation& aResponse, TUint aId, TUint aTrackId, IDvInvocationResponseString& aUdn, IDvInvocationResponseString& aMetadata);
+		virtual void Read(IDvInvocation& aResponse, TUint aId, TUint aTrackId, IDvInvocationResponseString& aMetadata);
 		virtual void ReadList(IDvInvocation& aResponse, TUint aId, const Brx& aTrackIdList, IDvInvocationResponseString& aTrackList);
-		virtual void Insert(IDvInvocation& aResponse, TUint aId, TUint aAfterTrackId, const Brx& aUdn, const Brx& aMetadataId, IDvInvocationResponseUint& aNewTrackId);
+		virtual void Insert(IDvInvocation& aResponse, TUint aId, TUint aAfterTrackId, const Brx& aMetadataId, IDvInvocationResponseUint& aNewTrackId);
 		virtual void DeleteId(IDvInvocation& aResponse, TUint aId, TUint aTrackId);
 		virtual void DeleteAll(IDvInvocation& aResponse, TUint aTrackId);
 		
