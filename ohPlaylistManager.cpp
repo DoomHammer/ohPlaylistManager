@@ -4,10 +4,12 @@
 #include <OpenHome/Private/OptionParser.h>
 #include <OpenHome/Net/Core/DvDevice.h>
 #include <OpenHome/Net/Core/OhNet.h>
+#include <OpenHome/Private/Debug.h>
 
 #include <stdio.h>
 
 #include "PlaylistManager.h"
+#include "ResourceManager.h"
 #include "Icon.h"
 
 using namespace OpenHome;
@@ -141,11 +143,14 @@ int CDECL main(int aArgc, char* aArgv[])
     Brhz name(optionName.Value());
 
 	UpnpLibrary::StartCombined(subnet);
+    
+    //Debug::SetLevel(Debug::kMedia);
 
 	Bwh udn("device");
     RandomiseUdn(udn, adapter);
 
-    DvDeviceStandard* device = new DvDeviceStandard(udn);
+    ResourceManager resourceManager(Brn("pm"));
+    DvDeviceStandard* device = new DvDeviceStandard(udn, resourceManager);
     
     device->SetAttribute("Upnp.Domain", "av.openhome.org");
     device->SetAttribute("Upnp.Type", "PlaylistManager");

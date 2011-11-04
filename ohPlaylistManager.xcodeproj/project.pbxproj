@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		6508E7DB13E973020058AB11 /* PlaylistManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6508E7D813E973020058AB11 /* PlaylistManager.cpp */; };
 		6508E7DC13E973020058AB11 /* ohPlaylistManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */; };
+		65245EC8146302A00006F918 /* ResourceManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 65245EC7146302A00006F918 /* ResourceManager.cpp */; };
 		659C341213F013AE0023A136 /* Stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 659C341113F013AE0023A136 /* Stream.cpp */; };
 		65C6E38A13EAAD400005E0A8 /* libohNetDevices.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65C6E38913EAAD400005E0A8 /* libohNetDevices.a */; };
 		65E10B2013E9926F00F3E45D /* libohNetCore.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 65E10B1F13E9926F00F3E45D /* libohNetCore.a */; };
@@ -33,6 +34,8 @@
 		6508E7D813E973020058AB11 /* PlaylistManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PlaylistManager.cpp; sourceTree = "<group>"; };
 		6508E7D913E973020058AB11 /* PlaylistManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PlaylistManager.h; sourceTree = "<group>"; };
 		6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ohPlaylistManager.cpp; sourceTree = "<group>"; };
+		65245EC7146302A00006F918 /* ResourceManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceManager.cpp; sourceTree = "<group>"; };
+		65245EC9146302D70006F918 /* ResourceManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ResourceManager.h; sourceTree = "<group>"; };
 		659C340E13F00A8E0023A136 /* Stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Stream.h; sourceTree = "<group>"; };
 		659C341113F013AE0023A136 /* Stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Stream.cpp; sourceTree = "<group>"; };
 		65C6E38913EAAD400005E0A8 /* libohNetDevices.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libohNetDevices.a; path = /Users/davidd/work/openhome/ohNet/Build/Obj/Mac/Debug/libohNetDevices.a; sourceTree = "<absolute>"; };
@@ -70,6 +73,8 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				65245EC9146302D70006F918 /* ResourceManager.h */,
+				65245EC7146302A00006F918 /* ResourceManager.cpp */,
 				6508E7D813E973020058AB11 /* PlaylistManager.cpp */,
 				6508E7D913E973020058AB11 /* PlaylistManager.h */,
 				6508E7DA13E973020058AB11 /* ohPlaylistManager.cpp */,
@@ -126,7 +131,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0410;
+				LastUpgradeCheck = 0420;
 			};
 			buildConfigurationList = 1DEB923508733DC60010E9CD /* Build configuration list for PBXProject "ohPlaylistManager" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -155,6 +160,7 @@
 				6508E7DB13E973020058AB11 /* PlaylistManager.cpp in Sources */,
 				6508E7DC13E973020058AB11 /* ohPlaylistManager.cpp in Sources */,
 				659C341213F013AE0023A136 /* Stream.cpp in Sources */,
+				65245EC8146302A00006F918 /* ResourceManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -206,6 +212,12 @@
 				HEADER_SEARCH_PATHS = ../ohNet/Build/Include;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "-fvisibility=hidden";
+				OTHER_LDFLAGS = (
+					"-framework",
+					CoreFoundation,
+					"-framework",
+					SystemConfiguration,
+				);
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -221,6 +233,12 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = ../ohNet/Build/Include;
 				OTHER_CFLAGS = "-fvisibility=hidden";
+				OTHER_LDFLAGS = (
+					"-framework",
+					CoreFoundation,
+					"-framework",
+					SystemConfiguration,
+				);
 				SDKROOT = macosx;
 			};
 			name = Release;

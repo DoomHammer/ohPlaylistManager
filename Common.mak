@@ -1,13 +1,17 @@
 
 objects_playlistManager = $(objdir)PlaylistManager$(objext) \
+                          $(objdir)ResourceManager$(objext) \
                           $(objdir)Stream$(objext)
 
 headers_playlistManager = Icon.h \
                           PlaylistManager.h \
+                          ResourceManager.h \
                           Stream.h
 
 $(objdir)PlaylistManager$(objext) : PlaylistManager.cpp $(headers_playlistManager)
 	$(compiler)PlaylistManager$(objext) -c $(cflags) $(includes) PlaylistManager.cpp
+$(objdir)ResourceManager$(objext) : ResourceManager.cpp $(headers_playlistManager)
+	$(compiler)ResourceManager$(objext) -c $(cflags) $(includes) ResourceManager.cpp
 $(objdir)Stream$(objext) : Stream.cpp $(headers_playlistManager)
 	$(compiler)Stream$(objext) -c $(cflags) $(includes) Stream.cpp
 
