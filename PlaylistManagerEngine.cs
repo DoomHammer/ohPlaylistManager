@@ -420,7 +420,8 @@ namespace OpenHome.Media
                 iPlaylists.Remove(p);
 
                 WriteToc();
-                // delete old playlist file
+
+                File.Delete(Path.Combine(iRootPath, p.Filename));
             }
 
             PlaylistsChanged();
