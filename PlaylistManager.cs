@@ -57,7 +57,7 @@ namespace OpenHome.Media
         {
             //iEngine.UrlPrefix = iDevice.GetResourceManagerUri(aAdapter);
             string address = new System.Net.IPAddress(aAdapter.Address()).ToString();
-            return string.Format("http://{0}:55178/{1}/upnp", address, iDevice.Udn());
+            return string.Format("http://{0}:55178/{1}/Upnp/resource/", address, iDevice.Udn());
         }
 
         private DvDeviceStandard iDevice;
