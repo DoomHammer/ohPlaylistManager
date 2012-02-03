@@ -18,13 +18,15 @@ namespace TestPlaylistManager
             Library library = Library.Create(initParams);
 
             SubnetList subnetList = new SubnetList();
-            uint subnet = subnetList.SubnetAt(0).Subnet();
+            NetworkAdapter adapter = subnetList.SubnetAt(0);
+            adapter.AddRef("PlaylistManager");
             subnetList.Destroy();
 
-            library.StartCombined(subnet);
+            library.StartCombined(adapter.Subnet());
 
             Directory.CreateDirectory("db");
-            PlaylistManager pm = new PlaylistManager("db", Environment.MachineName, "OpenHome", "http://www.openhome.org");
+            PlaylistManager pm = new PlaylistManager(adapter, "db", Environment.MachineName, "OpenHome", "http://www.openhome.org");
+            adapter.RemoveRef("PlaylistManager");
             pm.Start();
 
             bool exit = false;

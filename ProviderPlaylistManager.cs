@@ -55,9 +55,14 @@ namespace OpenHome.Media
             iPlaylistManagerEngine.SetListener(this);
         }
 
+        public void UrlPrefixChanged()
+        {
+            UpdateUrlPrefix();
+        }
+
         public void ImagesChanged()
         {
-            UpdateImageXml();
+            UpdateImagesXml();
         }
 
         public void MetadataChanged()
@@ -310,14 +315,24 @@ namespace OpenHome.Media
             iPlaylistManagerEngine.DeleteAll(aTrackId);
         }
 
-        private void UpdateImageXml()
+        private void UpdateUrlPrefix()
         {
-            SetPropertyImagesXml(iPlaylistManagerEngine.ImagesXml(""));
+            PropertiesLock();
+
+            UpdateMetadata();
+            UpdateImagesXml();
+
+            PropertiesUnlock();
+        }
+
+        private void UpdateImagesXml()
+        {
+            SetPropertyImagesXml(iPlaylistManagerEngine.ImagesXml());
         }
 
         private void UpdateMetadata()
         {
-            SetPropertyMetadata(iPlaylistManagerEngine.Metadata(""));
+            SetPropertyMetadata(iPlaylistManagerEngine.Metadata());
         }
 
         private void UpdateIdArray()

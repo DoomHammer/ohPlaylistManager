@@ -7,6 +7,7 @@ namespace OpenHome.Media
 {
     internal interface IPlaylistManagerEngineListener
     {
+        void UrlPrefixChanged();
         void ImagesChanged();
         void MetadataChanged();
         void PlaylistsChanged();
@@ -22,14 +23,15 @@ namespace OpenHome.Media
     {
         public class PlaylistManagerEngineErrorException : Exception { }
 
-        public PlaylistManagerEngine(string aRootPath, string aName)
+        public PlaylistManagerEngine(string aUrlPrefix, string aRootPath, string aName)
         {
+            iUrlPrefix = aUrlPrefix;
             iRootPath = aRootPath;
             iName = aName;
 
             iLock = new object();
             iPlaylists = new List<Playlist>();
-            iCache = new Cache();
+            iCache = new Cache(aRootPath);
             iToken = 0;
 
             // read any playlists from disk
@@ -100,6 +102,26 @@ namespace OpenHome.Media
             }
         }
 
+        public string ResourceManagerUri
+        {
+            get
+            {
+                lock(iLock)
+                {
+                    return iUrlPrefix;
+                }
+            }
+            set
+            {
+                lock(iLock)
+                {
+                    iUrlPrefix = value;
+                }
+
+                UrlPrefixChanged();
+            }
+        }
+
         public uint Token
         {
             get
@@ -116,6 +138,17 @@ namespace OpenHome.Media
             lock(iLock)
             {
                 return aToken == iToken;
+            }
+        }
+
+        public void UrlPrefixChanged()
+        {
+            lock(iLock)
+            {
+                if(iListener != null)
+                {
+                    iListener.UrlPrefixChanged();
+                }
             }
         }
 
@@ -164,6 +197,11 @@ namespace OpenHome.Media
                 }
             }
         }
+
+        public string ImagesXml()
+        {
+            return ImagesXml(iUrlPrefix);
+        }
         
         public string ImagesXml(string aUrlPrefix)
         {
@@ -191,6 +229,11 @@ namespace OpenHome.Media
 
                 return doc.OuterXml;
             }
+        }
+
+        public string Metadata()
+        {
+            return Metadata(iUrlPrefix);
         }
 
         public string Metadata(string aUrlPrefix)
@@ -645,6 +688,7 @@ namespace OpenHome.Media
         public static readonly uint kMaxTracks = 1000;
 
         private string iRootPath;
+        private string iUrlPrefix;
         private string iName;
 
         private object iLock;

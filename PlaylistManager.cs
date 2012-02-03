@@ -1,12 +1,13 @@
 using System;
 
+using OpenHome.Net.Core;
 using OpenHome.Net.Device;
 
 namespace OpenHome.Media
 {
     public class PlaylistManager : IDisposable
     {
-        public PlaylistManager(string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl)
+        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl)
         {
             string name = string.Format("{0} ({1})", aManufacturer, aMachineName);
             string udn = string.Format("{0}-PlaylistManager-{1}", aManufacturer, aMachineName);
@@ -26,7 +27,7 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.SerialNumber", "");
             iDevice.SetAttribute("Upnp.Upc", "");
 
-            iEngine = new PlaylistManagerEngine(aRootPath, name);
+            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), aRootPath, name);
             iProvider = new ProviderPlaylistManager(iDevice, iEngine, PlaylistManagerEngine.kMaxPlaylists, PlaylistManagerEngine.kMaxTracks);
         }
 
@@ -42,12 +43,24 @@ namespace OpenHome.Media
             iDevice.SetEnabled();
         }
 
-        public void Stop(Action aAction)
+        public void Stop(System.Action aAction)
         {
             iDevice.SetDisabled(aAction);
         }
 
-        private DvDevice iDevice;
+        public void SetAdapter(NetworkAdapter aAdapter)
+        {
+            iEngine.ResourceManagerUri = GetResourceManagerUri(aAdapter);
+        }
+
+        private string GetResourceManagerUri(NetworkAdapter aAdapter)
+        {
+            //iEngine.UrlPrefix = iDevice.GetResourceManagerUri(aAdapter);
+            string address = new System.Net.IPAddress(aAdapter.Address()).ToString();
+            return string.Format("http://{0}:55178/{1}/upnp", address, iDevice.Udn());
+        }
+
+        private DvDeviceStandard iDevice;
         private PlaylistManagerEngine iEngine;
         private ProviderPlaylistManager iProvider;
     }

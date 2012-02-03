@@ -293,8 +293,10 @@ namespace OpenHome.Media
 
     internal class Cache
     {
-        public Cache()
+        public Cache(string aRootPath)
         {
+            iRootPath = aRootPath;
+
             iLock = new object();
             iList = new List<KeyValuePair<PlaylistData, ICacheListener>>();
         }
@@ -322,7 +324,7 @@ namespace OpenHome.Media
                     iList.RemoveAt(0);
                 }
 
-                PlaylistData data = new PlaylistData(id, aPlaylist.Filename);
+                PlaylistData data = new PlaylistData(id, Path.Combine(iRootPath, aPlaylist.Filename));
                 iList.Add(new KeyValuePair<PlaylistData, ICacheListener>(data, aCacheListener));
 
                 return data;
@@ -331,6 +333,7 @@ namespace OpenHome.Media
 
         public static readonly uint kMaxCacheSize = 1000;
 
+        private string iRootPath;
         private object iLock;
         private List<KeyValuePair<PlaylistData, ICacheListener>> iList;
     };
