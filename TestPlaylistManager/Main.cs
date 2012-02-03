@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 using OpenHome;
 using OpenHome.Net.Core;
@@ -22,7 +23,8 @@ namespace TestPlaylistManager
 
             library.StartCombined(subnet);
 
-            PlaylistManager pm = new PlaylistManager(Environment.MachineName, "OpenHome", "http://www.openhome.org");
+            Directory.CreateDirectory("db");
+            PlaylistManager pm = new PlaylistManager("db", Environment.MachineName, "OpenHome", "http://www.openhome.org");
             pm.Start();
 
             bool exit = false;

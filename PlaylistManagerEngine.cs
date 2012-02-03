@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace OpenHome.Media
 {
-    public interface IPlaylistManagerListener
+    internal interface IPlaylistManagerEngineListener
     {
         void ImagesChanged();
         void MetadataChanged();
@@ -18,12 +18,13 @@ namespace OpenHome.Media
         string Name { set; }
     }
 
-    public class PlaylistManager : INameable, IPlaylistManagerListener, IDisposable
+    internal class PlaylistManagerEngine : INameable, IPlaylistManagerEngineListener, IDisposable
     {
-        public class PlaylistManagerErrorException : Exception { }
+        public class PlaylistManagerEngineErrorException : Exception { }
 
-        public PlaylistManager(string aName)
+        public PlaylistManagerEngine(string aRootPath, string aName)
         {
+            iRootPath = aRootPath;
             iName = aName;
 
             iLock = new object();
@@ -33,27 +34,31 @@ namespace OpenHome.Media
 
             // read any playlists from disk
             uint lastId = 0;
-            FileStream f = File.OpenRead("Toc.txt");
-            StreamReader s = new StreamReader(f);
-            if(s != null)
+            string tocFilename = Path.Combine(aRootPath, "Toc.txt");
+            if(File.Exists(tocFilename))
             {
-                uint count = uint.Parse(s.ReadLine());
-                for(uint i = 0; i < count; ++i)
+                FileStream f = File.OpenRead(tocFilename);
+                StreamReader s = new StreamReader(f);
+                if(s != null)
                 {
-                    string filename = s.ReadLine();
-                    string[] split = filename.Split(new char[] { '.' }, 2);
-                    uint id = uint.Parse(split[0]);
-    
-                    if(id > lastId)
+                    uint count = uint.Parse(s.ReadLine());
+                    for(uint i = 0; i < count; ++i)
                     {
-                        lastId = id;
+                        string filename = s.ReadLine();
+                        string[] split = filename.Split(new char[] { '.' }, 2);
+                        uint id = uint.Parse(split[0]);
+    
+                        if(id > lastId)
+                        {
+                            lastId = id;
+                        }
+    
+                        Playlist p = new Playlist(iCache, aRootPath, id, filename);
+                        iPlaylists.Add(p);
                     }
     
-                    Playlist p = new Playlist(iCache, id, filename);
-                    iPlaylists.Add(p);
+                    s.Close();
                 }
-
-                s.Close();
             }
 
             iIdGenerator = new IdGenerator(lastId);
@@ -63,7 +68,7 @@ namespace OpenHome.Media
         {
         }
         
-        public void SetListener(IPlaylistManagerListener aListener)
+        public void SetListener(IPlaylistManagerEngineListener aListener)
         {
             lock(iLock)
             {
@@ -118,7 +123,10 @@ namespace OpenHome.Media
         {
             lock(iLock)
             {
-                iListener.ImagesChanged();
+                if(iListener != null)
+                {
+                    iListener.ImagesChanged();
+                }
             }
         }
 
@@ -126,7 +134,10 @@ namespace OpenHome.Media
         {
             lock(iLock)
             {
-                iListener.MetadataChanged();
+                if(iListener != null)
+                {
+                    iListener.MetadataChanged();
+                }
             }
         }
 
@@ -135,7 +146,10 @@ namespace OpenHome.Media
             lock(iLock)
             {
                 ++iToken;
-                iListener.PlaylistsChanged();
+                if(iListener != null)
+                {
+                    iListener.PlaylistsChanged();
+                }
             }
         }
 
@@ -144,7 +158,10 @@ namespace OpenHome.Media
             lock(iLock)
             {
                 ++iToken;
-                iListener.PlaylistChanged();
+                if(iListener != null)
+                {
+                    iListener.PlaylistChanged();
+                }
             }
         }
         
@@ -152,12 +169,12 @@ namespace OpenHome.Media
         {
             lock(iLock)
             {
-                // just some test code!!!
                 XmlDocument doc = new XmlDocument();
                 XmlElement imageList = doc.CreateElement("ImageList");
                 doc.AppendChild(imageList);
 
-                for(int i = 0; i < 1; ++i)
+                // just some test code!!!
+                /*for(int i = 0; i < 1; ++i)
                 {
                     XmlElement entry = doc.CreateElement("Entry");
 
@@ -170,7 +187,7 @@ namespace OpenHome.Media
                     entry.AppendChild(uri);
 
                     imageList.AppendChild(entry);
-                }
+                }*/
 
                 return doc.OuterXml;
             }
@@ -285,7 +302,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 aName = p.Name;
@@ -303,7 +320,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
                 p.Name = aName;
 
@@ -320,7 +337,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
                 p.Description = aDescription;
 
@@ -337,7 +354,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
                 p.ImageId = aImageId;
 
@@ -365,7 +382,7 @@ namespace OpenHome.Media
                     }
                     if(index == iPlaylists.Count)
                     {
-                        throw new PlaylistManagerErrorException();
+                        throw new PlaylistManagerEngineErrorException();
                     }
                     ++index;    // we insert after the id, not before
                 }
@@ -373,7 +390,7 @@ namespace OpenHome.Media
                 id = iIdGenerator.NewId();
                 string filename = string.Format("{0}.txt", id);
 
-                Playlist playlist = new Playlist(iCache, id, filename, aName, aDescription, aImageId);
+                Playlist playlist = new Playlist(iCache, iRootPath, id, filename, aName, aDescription, aImageId);
                 iPlaylists.Insert(index, playlist);
 
                 WriteToc();
@@ -413,7 +430,7 @@ namespace OpenHome.Media
         {
             if(aId == 0)
             {
-                throw new PlaylistManagerErrorException();
+                throw new PlaylistManagerEngineErrorException();
             }
 
             lock(iLock)
@@ -421,7 +438,7 @@ namespace OpenHome.Media
                 Playlist playlist = FindPlaylist(aId);
                 if(playlist == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 int index = 0;
@@ -436,7 +453,7 @@ namespace OpenHome.Media
                     }
                     if(index == iPlaylists.Count)
                     {
-                        throw new PlaylistManagerErrorException();
+                        throw new PlaylistManagerEngineErrorException();
                     }
                     ++index;    // we insert after the id, not before
                 }
@@ -470,13 +487,13 @@ namespace OpenHome.Media
             {
                 if(aId == 0)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 p.IdArray(out aIdArray);
@@ -490,7 +507,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 aMetadata = p.Read(aTrackId);
@@ -504,7 +521,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 XmlDocument doc = new XmlDocument();
@@ -543,7 +560,7 @@ namespace OpenHome.Media
                 Playlist p = FindPlaylist(aId);
                 if(p == null)
                 {
-                    throw new PlaylistManagerErrorException();
+                    throw new PlaylistManagerEngineErrorException();
                 }
 
                 newId = p.Insert(aAfterId, aMetadata);
@@ -607,7 +624,7 @@ namespace OpenHome.Media
 
         private void WriteToc()
         {
-            StreamWriter s = File.CreateText("Toc.txt");
+            StreamWriter s = File.CreateText(Path.Combine(iRootPath, "Toc.txt"));
 
             s.WriteLine(iPlaylists.Count);
             foreach(Playlist p in iPlaylists)
@@ -626,14 +643,15 @@ namespace OpenHome.Media
         public static readonly uint kMaxPlaylists = 500;
         public static readonly uint kMaxTracks = 1000;
 
+        private string iRootPath;
+        private string iName;
+
         private object iLock;
         
-        private IPlaylistManagerListener iListener;
+        private IPlaylistManagerEngineListener iListener;
         
         private IdGenerator iIdGenerator;
         private Cache iCache;
-        
-        private string iName;
         
         private List<Playlist> iPlaylists;
         private uint iToken;

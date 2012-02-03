@@ -6,7 +6,7 @@ namespace OpenHome.Media
 {
     public class PlaylistManager : IDisposable
     {
-        public PlaylistManager(string aMachineName, string aManufacturer, string aManufacturerUrl)
+        public PlaylistManager(string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl)
         {
             string name = string.Format("{0} ({1})", aManufacturer, aMachineName);
             string udn = string.Format("{0}-PlaylistManager-{1}", aManufacturer, aMachineName);
@@ -26,7 +26,7 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.SerialNumber", "");
             iDevice.SetAttribute("Upnp.Upc", "");
 
-            iEngine = new PlaylistManagerEngine(name);
+            iEngine = new PlaylistManagerEngine(aRootPath, name);
             iProvider = new ProviderPlaylistManager(iDevice, iEngine, PlaylistManagerEngine.kMaxPlaylists, PlaylistManagerEngine.kMaxTracks);
         }
 

@@ -15,12 +15,12 @@ namespace OpenHome.Media
      
     internal class PlaylistHeader : IPlaylistHeader
     {
-        public PlaylistHeader(string aFilename)
+        public PlaylistHeader(string aRootPath, string aFilename)
         {
             iFilename = aFilename;
 
             XmlDocument doc = new XmlDocument();
-            doc.Load(aFilename);
+            doc.Load(Path.Combine(aRootPath, aFilename));
 
             iName = doc.SelectSingleNode("Playlist/Name").FirstChild.Value;
             XmlNode desc = doc.SelectSingleNode("Playlist/Description");
@@ -341,9 +341,10 @@ namespace OpenHome.Media
         public class PlaylistFullException : Exception { }
         public class PlaylistErrorException : Exception { }
 
-        public Playlist(Cache aCache, uint aId, string aFilename, string aName, string aDescription, uint aImageId)
+        public Playlist(Cache aCache, string aRootPath, uint aId, string aFilename, string aName, string aDescription, uint aImageId)
         {
             iCache = aCache;
+            iRootPath = aRootPath;
             iId = aId;
 
             iHeader = new PlaylistHeader(aFilename, aName, aDescription, aImageId);
@@ -352,12 +353,13 @@ namespace OpenHome.Media
             iToken = 0;
         }
 
-        public Playlist(Cache aCache, uint aId, string aFilename)
+        public Playlist(Cache aCache, string aRootPath, uint aId, string aFilename)
         {
             iCache = aCache;
+            iRootPath = aRootPath;
             iId = aId;
 
-            iHeader = new PlaylistHeader(aFilename);
+            iHeader = new PlaylistHeader(aRootPath, aFilename);
             iLock = new object();
             iData = null;
             iToken = 1;
@@ -540,7 +542,7 @@ namespace OpenHome.Media
                     iData.ToXml(doc, playlist);
                 }
 
-                doc.Save(Filename);
+                doc.Save(Path.Combine(iRootPath, Filename));
             }
         }
     
@@ -553,6 +555,8 @@ namespace OpenHome.Media
         }
 
         private object iLock;
+
+        private string iRootPath;
 
         private readonly uint iId;
         private uint iToken;
