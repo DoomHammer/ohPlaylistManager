@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 using OpenHome.Net.Core;
 using OpenHome.Net.Device;
@@ -12,7 +13,9 @@ namespace OpenHome.Media
             string name = string.Format("{0} ({1})", aManufacturer, aMachineName);
             string udn = string.Format("{0}-PlaylistManager-{1}", aManufacturer, aMachineName);
 
-            iDevice = new DvDeviceStandard(udn);
+            string resourcePath = Path.Combine(aRootPath, "Resources");
+            Directory.CreateDirectory(resourcePath);
+            iDevice = new DvDeviceStandard(udn, new ResourceManager(resourcePath));
 
             iDevice.SetAttribute("Upnp.Domain", "av.openhome.org");
             iDevice.SetAttribute("Upnp.Type", "PlaylistManager");
@@ -27,7 +30,9 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.SerialNumber", "");
             iDevice.SetAttribute("Upnp.Upc", "");
 
-            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), aRootPath, name);
+            string databasePath = Path.Combine(aRootPath, "Database");
+            Directory.CreateDirectory(databasePath);
+            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), databasePath, name);
             iProvider = new ProviderPlaylistManager(iDevice, iEngine, PlaylistManagerEngine.kMaxPlaylists, PlaylistManagerEngine.kMaxTracks);
         }
 

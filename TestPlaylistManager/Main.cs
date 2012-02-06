@@ -25,7 +25,7 @@ namespace TestPlaylistManager
             library.StartCombined(adapter.Subnet());
 
             Directory.CreateDirectory("db");
-            PlaylistManager pm = new PlaylistManager(adapter, "db", Environment.MachineName, "OpenHome", "http://www.openhome.org");
+            PlaylistManager pm = new PlaylistManager(adapter, "", Environment.MachineName, "OpenHome", "http://www.openhome.org");
             adapter.RemoveRef("PlaylistManager");
             pm.Start();
 

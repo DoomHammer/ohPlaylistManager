@@ -255,7 +255,7 @@ namespace OpenHome.Media
                 item.AppendChild(title);
 
                 XmlElement albumArtUri = doc.CreateElement("upnp", "albumArtURI", "urn:schemas-upnp-org:metadata-1-0/upnp/");
-                albumArtUri.AppendChild(doc.CreateTextNode(string.Format("{0}images/Icon.png", aUrlPrefix)));
+                albumArtUri.AppendChild(doc.CreateTextNode(string.Format("{0}Icon.png", aUrlPrefix)));
                 item.AppendChild(albumArtUri);
 
                 XmlElement classType = doc.CreateElement("upnp", "class", "urn:schemas-upnp-org:metadata-1-0/upnp/");
