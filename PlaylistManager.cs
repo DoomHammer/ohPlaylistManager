@@ -15,7 +15,7 @@ namespace OpenHome.Media
 
             string resourcePath = Path.Combine(aRootPath, "PlaylistManager");
             Directory.CreateDirectory(resourcePath);
-            iDevice = new DvDeviceStandard(udn, new ResourceManager(resourcePath));
+            iDevice = new DvDeviceStandard(udn, new ResourceManager(aRootPath));
 
             iDevice.SetAttribute("Upnp.Domain", "av.openhome.org");
             iDevice.SetAttribute("Upnp.Type", "PlaylistManager");
