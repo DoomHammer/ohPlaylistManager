@@ -24,11 +24,11 @@ namespace TestPlaylistManager
 
             library.StartCombined(adapter.Subnet());
 
-            Directory.CreateDirectory("db");
-            PlaylistManager pm = new PlaylistManager(adapter, "", Environment.MachineName, "OpenHome", "http://www.openhome.org");
+            PlaylistManager pm = new PlaylistManager(adapter, "", Environment.MachineName, "OpenHome", "http://www.openhome.org", "http://www.openhome.org", "Icon.png");
             adapter.RemoveRef("PlaylistManager");
             pm.Start();
 
+            Console.WriteLine("Press 'q' to quit");
             bool exit = false;
             while (!exit)
             {

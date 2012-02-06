@@ -23,11 +23,12 @@ namespace OpenHome.Media
     {
         public class PlaylistManagerEngineErrorException : Exception { }
 
-        public PlaylistManagerEngine(string aUrlPrefix, string aRootPath, string aName)
+        public PlaylistManagerEngine(string aUrlPrefix, string aRootPath, string aName, string aIcon)
         {
             iUrlPrefix = aUrlPrefix;
             iRootPath = aRootPath;
             iName = aName;
+            iIcon = aIcon;
 
             iLock = new object();
             iPlaylists = new List<Playlist>();
@@ -255,7 +256,7 @@ namespace OpenHome.Media
                 item.AppendChild(title);
 
                 XmlElement albumArtUri = doc.CreateElement("upnp", "albumArtURI", "urn:schemas-upnp-org:metadata-1-0/upnp/");
-                albumArtUri.AppendChild(doc.CreateTextNode(string.Format("{0}Icon.png", aUrlPrefix)));
+                albumArtUri.AppendChild(doc.CreateTextNode(string.Format("{0}{1}", aUrlPrefix, iIcon)));
                 item.AppendChild(albumArtUri);
 
                 XmlElement classType = doc.CreateElement("upnp", "class", "urn:schemas-upnp-org:metadata-1-0/upnp/");
@@ -690,6 +691,7 @@ namespace OpenHome.Media
         private string iRootPath;
         private string iUrlPrefix;
         private string iName;
+        private string iIcon;
 
         private object iLock;
         

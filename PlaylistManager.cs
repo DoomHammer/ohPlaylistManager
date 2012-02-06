@@ -8,12 +8,12 @@ namespace OpenHome.Media
 {
     public class PlaylistManager : IDisposable
     {
-        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl)
+        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModelUrl, string aIcon)
         {
             string name = string.Format("{0} ({1})", aManufacturer, aMachineName);
             string udn = string.Format("{0}-PlaylistManager-{1}", aManufacturer, aMachineName);
 
-            string resourcePath = Path.Combine(aRootPath, "Resources");
+            string resourcePath = Path.Combine(aRootPath, "PlaylistManager");
             Directory.CreateDirectory(resourcePath);
             iDevice = new DvDeviceStandard(udn, new ResourceManager(resourcePath));
 
@@ -26,13 +26,13 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.ModelDescription", aManufacturer + " PlaylistManager");
             iDevice.SetAttribute("Upnp.ModelName", aManufacturer + " PlaylistManager");
             iDevice.SetAttribute("Upnp.ModelNumber", "1");
-            iDevice.SetAttribute("Upnp.ModelUrl", aManufacturerUrl);
+            iDevice.SetAttribute("Upnp.ModelUrl", aModelUrl);
             iDevice.SetAttribute("Upnp.SerialNumber", "");
             iDevice.SetAttribute("Upnp.Upc", "");
 
-            string databasePath = Path.Combine(aRootPath, "Database");
+            string databasePath = Path.Combine(resourcePath, "Database");
             Directory.CreateDirectory(databasePath);
-            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), databasePath, name);
+            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), databasePath, name, aIcon);
             iProvider = new ProviderPlaylistManager(iDevice, iEngine, PlaylistManagerEngine.kMaxPlaylists, PlaylistManagerEngine.kMaxTracks);
         }
 
