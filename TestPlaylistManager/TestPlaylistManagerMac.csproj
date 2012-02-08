@@ -33,10 +33,14 @@
     <Reference Include="ohNet.net">
       <HintPath>..\..\ohNet\Build\Obj\Mac\Release\ohNet.net.dll</HintPath>
     </Reference>
+    <Reference Include="ohXen">
+      <HintPath>..\..\ohXen\Build\Obj\Mac\Release\ohXen.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IconResourceManager.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

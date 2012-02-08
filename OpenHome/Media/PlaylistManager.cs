@@ -8,14 +8,14 @@ namespace OpenHome.Media
 {
     public class PlaylistManager : IDisposable
     {
-        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModelUrl, string aIcon)
+        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModel, string aModelUrl, IResourceManager aResourceManager, string aIconUri)
         {
             string name = string.Format("{0} ({1})", aManufacturer, aMachineName);
-            string udn = string.Format("{0}-PlaylistManager-{1}", aManufacturer, aMachineName);
+            string udn = string.Format("{0}-{1}-PlaylistManager-{2}", aManufacturer, aModel, aMachineName);
 
             string resourcePath = Path.Combine(aRootPath, "PlaylistManager");
             Directory.CreateDirectory(resourcePath);
-            iDevice = new DvDeviceStandard(udn, new ResourceManager(aRootPath));
+            iDevice = new DvDeviceStandard(udn, new ResourceManager(aResourceManager));
 
             iDevice.SetAttribute("Upnp.Domain", "av.openhome.org");
             iDevice.SetAttribute("Upnp.Type", "PlaylistManager");
@@ -23,8 +23,8 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.FriendlyName", name);
             iDevice.SetAttribute("Upnp.Manufacturer", aManufacturer);
             iDevice.SetAttribute("Upnp.ManufacturerUrl", aManufacturerUrl);
-            iDevice.SetAttribute("Upnp.ModelDescription", aManufacturer + " PlaylistManager");
-            iDevice.SetAttribute("Upnp.ModelName", aManufacturer + " PlaylistManager");
+            iDevice.SetAttribute("Upnp.ModelDescription", aModel);
+            iDevice.SetAttribute("Upnp.ModelName", aModel);
             iDevice.SetAttribute("Upnp.ModelNumber", "1");
             iDevice.SetAttribute("Upnp.ModelUrl", aModelUrl);
             iDevice.SetAttribute("Upnp.SerialNumber", "");
@@ -32,7 +32,7 @@ namespace OpenHome.Media
 
             string databasePath = Path.Combine(resourcePath, "Database");
             Directory.CreateDirectory(databasePath);
-            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), databasePath, name, aIcon);
+            iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), databasePath, name, aIconUri);
             iProvider = new ProviderPlaylistManager(iDevice, iEngine, PlaylistManagerEngine.kMaxPlaylists, PlaylistManagerEngine.kMaxTracks);
         }
 
