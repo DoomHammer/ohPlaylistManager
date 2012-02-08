@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ohPlaylistManagerWindows", "ohPlaylistManagerWindows.csproj", "{876E014E-8B73-40C3-A48C-368CFE1EE2C1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlaylistManagerWindows", "TestPlaylistManager\TestPlaylistManagerWindows.csproj", "{52E71CF3-BDC5-48D0-B22B-35AEBB42B03E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{876E014E-8B73-40C3-A48C-368CFE1EE2C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{876E014E-8B73-40C3-A48C-368CFE1EE2C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{876E014E-8B73-40C3-A48C-368CFE1EE2C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{876E014E-8B73-40C3-A48C-368CFE1EE2C1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52E71CF3-BDC5-48D0-B22B-35AEBB42B03E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52E71CF3-BDC5-48D0-B22B-35AEBB42B03E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52E71CF3-BDC5-48D0-B22B-35AEBB42B03E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52E71CF3-BDC5-48D0-B22B-35AEBB42B03E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = TestPlaylistManager\TestPlaylistManager.csproj
+	EndGlobalSection
+EndGlobal

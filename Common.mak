@@ -1,23 +1,19 @@
+all : $(objdir)/ohPlaylistManager.dll
 
-objects_playlistManager = $(objdir)PlaylistManager$(objext) \
-                          $(objdir)ResourceManager$(objext) \
-                          $(objdir)Stream$(objext)
+source = AssemblyInfo.cs \
+BigEndianConverter.cs \
+Playlist.cs \
+PlaylistManager.cs \
+PlaylistManagerEngine.cs \
+ProviderPlaylistManager.cs \
+ResourceManager.cs \
 
-headers_playlistManager = Icon.h \
-                          PlaylistManager.h \
-                          ResourceManager.h \
-                          Stream.h
-
-$(objdir)PlaylistManager$(objext) : PlaylistManager.cpp $(headers_playlistManager)
-	$(compiler)PlaylistManager$(objext) -c $(cflags) $(includes) PlaylistManager.cpp
-$(objdir)ResourceManager$(objext) : ResourceManager.cpp $(headers_playlistManager)
-	$(compiler)ResourceManager$(objext) -c $(cflags) $(includes) ResourceManager.cpp
-$(objdir)Stream$(objext) : Stream.cpp $(headers_playlistManager)
-	$(compiler)Stream$(objext) -c $(cflags) $(includes) Stream.cpp
-
-all_common : $(objdir)ohPlaylistManager$(exeext)
-
-$(objdir)ohPlaylistManager$(exeext) : ohPlaylistManager.cpp $(objects_playlistManager) $(headers_ohPlaylistManager)
-	$(compiler)ohPlaylistManager$(objext) -c $(cflags) $(includes) ohPlaylistManager.cpp
-	$(link) $(linkoutput)$(objdir)ohPlaylistManager$(exeext) $(objdir)ohPlaylistManager$(objext) $(objects_playlistManager) $(ohnetdir)$(libprefix)ohNetCore$(libext) $(ohnetdir)$(libprefix)TestFramework$(libext) $(ohnetdir)$(libprefix)ohNetDevices$(libext)
+$(objdir)/ohPlaylistManager.dll : $(objdir) $(source)
+	$(csharp) /target:library \
+		/out:$(objdir)$(dirsep)ohPlaylistManager.dll \
+		/reference:System.dll \
+		/reference:System.Xml.dll \
+		/reference:..$(dirsep)ohNet$(dirsep)$(objdir)$(dirsep)ohNet.net.dll \
+		/reference:..$(dirsep)ohNet$(dirsep)$(objdir)$(dirsep)DvAvOpenhomeOrgPlaylistManager1.net.dll \
+		$(source)
 
