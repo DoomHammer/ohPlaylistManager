@@ -10,7 +10,8 @@ namespace OpenHome.Media
     {
         public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModel, string aModelUrl, IResourceManager aResourceManager, string aIconUri)
         {
-            string name = string.Format("{0} ({1})", aManufacturer, aMachineName);
+            string upnpname = string.Format("{0} {1} PlaylistManager ({2})", aManufacturer, aModel, aMachineName);
+            string name = string.Format("{0} {1} ({2})", aManufacturer, aModel, aMachineName);
             string udn = string.Format("{0}-{1}-PlaylistManager-{2}", aManufacturer, aModel, aMachineName);
 
             string resourcePath = Path.Combine(aRootPath, "PlaylistManager");
@@ -20,7 +21,7 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.Domain", "av.openhome.org");
             iDevice.SetAttribute("Upnp.Type", "PlaylistManager");
             iDevice.SetAttribute("Upnp.Version", "1");
-            iDevice.SetAttribute("Upnp.FriendlyName", name);
+            iDevice.SetAttribute("Upnp.FriendlyName", upnpname);
             iDevice.SetAttribute("Upnp.Manufacturer", aManufacturer);
             iDevice.SetAttribute("Upnp.ManufacturerUrl", aManufacturerUrl);
             iDevice.SetAttribute("Upnp.ModelDescription", aModel);
