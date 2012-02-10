@@ -31,6 +31,9 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ohXen">
+      <HintPath>..\..\ohXen\Build\Obj\Windows\Release\ohXen.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="ohNet.net">
       <HintPath>..\..\ohNet\Build\Obj\Windows\Release\ohNet.net.dll</HintPath>
