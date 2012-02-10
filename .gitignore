@@ -1,0 +1,9 @@
+*.pdb
+*.pidb
+*~
+.*.swp
+*.suo
+
+bin/
+obj/
+/Build/
