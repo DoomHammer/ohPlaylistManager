@@ -20,7 +20,7 @@ namespace TestPlaylistManager
             SubnetList subnetList = new SubnetList();
             NetworkAdapter adapter = subnetList.SubnetAt(0);
             adapter.AddRef("PlaylistManager");
-            subnetList.Destroy();
+            subnetList.Dispose();
 
             library.StartCombined(adapter.Subnet());
 
@@ -44,7 +44,7 @@ namespace TestPlaylistManager
             pm.Stop(OnStop);
             pm.Dispose();
 
-            library.Close();
+            library.Dispose();
         }
 
         private static void OnStop()
