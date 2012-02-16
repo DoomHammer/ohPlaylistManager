@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 
 using OpenHome;
 using OpenHome.Net.Core;
@@ -24,7 +25,7 @@ namespace TestPlaylistManager
 
             library.StartCombined(adapter.Subnet());
 
-            string rootPath = OpenHome.Xen.Environment.AppPath;
+            string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             IconResourceManager rm = new IconResourceManager(rootPath);
             PlaylistManager pm = new PlaylistManager(adapter, rootPath, Environment.MachineName, "OpenHome", "http://www.openhome.org", "PlaylistManager", "http://www.openhome.org", rm, "Icon.png");
             adapter.RemoveRef("PlaylistManager");
