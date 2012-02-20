@@ -3,6 +3,7 @@ using System.IO;
 
 using OpenHome.Net.Core;
 using OpenHome.Net.Device;
+using OpenHome.Net.ControlPoint;
 
 namespace OpenHome.Media
 {
@@ -31,6 +32,8 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.SerialNumber", "");
             iDevice.SetAttribute("Upnp.Upc", "");
 
+            iControlPoint = new CpDeviceListUpnpServiceType("upnp.org", "ContentDirectory", 1, Added, Removed);
+
             string databasePath = Path.Combine(resourcePath, "Database");
             Directory.CreateDirectory(databasePath);
             iEngine = new PlaylistManagerEngine(GetResourceManagerUri(aAdapter), databasePath, name, aIconUri);
@@ -39,9 +42,25 @@ namespace OpenHome.Media
 
         public void Dispose()
         {
-            iProvider.Dispose();
-            iEngine.Dispose();
-            iDevice.Dispose();
+            if(iProvider != null)
+            {
+                iProvider.Dispose();
+            }
+
+            if(iEngine != null)
+            {
+                iEngine.Dispose();
+            }
+
+            if(iControlPoint != null)
+            {
+                iControlPoint.Dispose();
+            }
+
+            if(iDevice != null)
+            {
+                iDevice.Dispose();
+            }
         }
 
         public void Start()
@@ -59,14 +78,24 @@ namespace OpenHome.Media
             iEngine.ResourceManagerUri = GetResourceManagerUri(aAdapter);
         }
 
+        private void Added(CpDeviceList aList, CpDevice aDevice)
+        {
+            //Console.WriteLine("Added: " + aDevice.Udn());
+        }
+
+        private void Removed(CpDeviceList aList, CpDevice aDevice)
+        {
+            //Console.WriteLine("Removed: " + aDevice.Udn());
+        }
+
         private string GetResourceManagerUri(NetworkAdapter aAdapter)
         {
-            //iEngine.UrlPrefix = iDevice.GetResourceManagerUri(aAdapter);
-            string address = new System.Net.IPAddress(aAdapter.Address()).ToString();
-            return string.Format("http://{0}:55178/{1}/Upnp/resource/", address, iDevice.Udn());
+            return iDevice.ResourceManagerUri(aAdapter);
         }
 
         private DvDeviceStandard iDevice;
+        private CpDeviceList iControlPoint;
+
         private PlaylistManagerEngine iEngine;
         private ProviderPlaylistManager iProvider;
     }

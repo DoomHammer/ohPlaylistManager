@@ -37,6 +37,9 @@
       <HintPath>..\ohNet\Build\Obj\Mac\Release\DvAvOpenhomeOrgPlaylistManager1.net.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="CpUpnpOrgContentDirectory1.net">
+      <HintPath>..\ohNet\Build\Obj\Mac\Release\CpUpnpOrgContentDirectory1.net.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
