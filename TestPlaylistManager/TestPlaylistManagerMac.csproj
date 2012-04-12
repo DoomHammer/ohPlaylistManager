@@ -44,8 +44,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="..\..\ohNet\Build\Obj\Mac\Release\libohNet.so">
-      <Link>libohNet.so</Link>
+    <None Include="..\..\ohNet\Build\Obj\Mac\Release\libohNet.dylib">
+      <Link>libohNet.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
