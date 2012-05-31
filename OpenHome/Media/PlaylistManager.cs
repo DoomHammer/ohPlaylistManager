@@ -12,7 +12,8 @@ namespace OpenHome.Media
         public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModel, string aModelUrl, IResourceManager aResourceManager, string aIconUri)
         {
             string upnpname = string.Format("{0} {1} PlaylistManager ({2})", aManufacturer, aModel, aMachineName);
-            string name = string.Format("{0} {1} PlaylistManager ({2})", aManufacturer, aModel, aMachineName);
+            // no need to include PlaylistManager in metadata as a user will protentially not be aware that they are running a playlist manager
+            string name = string.Format("{0} {1} ({2})", aManufacturer, aModel, aMachineName);
             string udn = string.Format("{0}-{1}-PlaylistManager-{2}", aManufacturer, aModel, aMachineName);
 
             string resourcePath = Path.Combine(aRootPath, "PlaylistManager");
