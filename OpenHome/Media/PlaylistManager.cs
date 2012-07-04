@@ -91,6 +91,11 @@ namespace OpenHome.Media
 
         private string GetResourceManagerUri(NetworkAdapter aAdapter)
         {
+            if (aAdapter == null)
+            {
+                return string.Empty;
+            }
+
             return iDevice.ResourceManagerUri(aAdapter);
         }
 
