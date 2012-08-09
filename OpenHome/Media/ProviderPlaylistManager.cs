@@ -8,11 +8,11 @@ namespace OpenHome.Media
 {
     internal class ProviderPlaylistManager : DvProviderAvOpenhomeOrgPlaylistManager1, IPlaylistManagerEngineListener, IDisposable
     {
-        private static readonly int kIdNotFound = 800;
+        private static readonly uint kIdNotFound = 800;
         private static readonly string kIdNotFoundMsg = "Id not found";
-        private static readonly int kPlaylistFull = 801;
+        private static readonly uint kPlaylistFull = 801;
         private static readonly string kPlaylistFullMsg = "Playlist full";
-        private static readonly int kInvalidRequest = 802;
+        private static readonly uint kInvalidRequest = 802;
         private static readonly string kInvalidRequestMsg = "Space separated id request list invalid";
 
         public ProviderPlaylistManager(DvDevice aDevice, PlaylistManagerEngine aPlaylistManagerEngine, uint aMaxPlaylistCount, uint aMaxTrackCount)
@@ -98,7 +98,7 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -119,7 +119,7 @@ namespace OpenHome.Media
             }
             catch(FormatException)
             {
-                throw new ActionError(kInvalidRequestMsg, kInvalidRequest);
+                throw new ActionError(kInvalidRequest, kInvalidRequestMsg);
             }
 
             iPlaylistManagerEngine.PlaylistReadList(list, out aPlaylistList);
@@ -133,7 +133,7 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -143,14 +143,14 @@ namespace OpenHome.Media
             {
                 if(aName.Length == 0)
                 {
-                    throw new ActionError(kInvalidRequestMsg, kInvalidRequest);
+                    throw new ActionError(kInvalidRequest, kInvalidRequestMsg);
                 }
                 iPlaylistManagerEngine.PlaylistSetName(aId, aName);
                 UpdateTokenArray();
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -163,7 +163,7 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -176,7 +176,7 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -186,14 +186,14 @@ namespace OpenHome.Media
             {
                 if(aName.Length == 0)
                 {
-                    throw new ActionError(kInvalidRequestMsg, kInvalidRequest);
+                    throw new ActionError(kInvalidRequest, kInvalidRequestMsg);
                 }
                 aNewId = iPlaylistManagerEngine.PlaylistInsert(aAfterId, aName, aDescription, aImageId);
                 UpdateArrays();
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -212,7 +212,7 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -246,11 +246,11 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
             catch(Playlist.PlaylistErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -271,7 +271,7 @@ namespace OpenHome.Media
             }
             catch(FormatException)
             {
-                throw new ActionError(kInvalidRequestMsg, kInvalidRequest);
+                throw new ActionError(kInvalidRequest, kInvalidRequestMsg);
             }
 
             if(iPlaylistManagerEngine.PlaylistExists(aId))
@@ -280,7 +280,7 @@ namespace OpenHome.Media
             }
             else
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
         }
 
@@ -293,15 +293,15 @@ namespace OpenHome.Media
             }
             catch(PlaylistManagerEngine.PlaylistManagerEngineErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
             catch(Playlist.PlaylistErrorException)
             {
-                throw new ActionError(kIdNotFoundMsg, kIdNotFound);
+                throw new ActionError(kIdNotFound, kIdNotFoundMsg);
             }
             catch(Playlist.PlaylistFullException)
             {
-                throw new ActionError(kPlaylistFullMsg, kPlaylistFull);
+                throw new ActionError(kPlaylistFull, kPlaylistFullMsg);
             }
         }
 
