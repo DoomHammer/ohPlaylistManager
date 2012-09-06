@@ -15,7 +15,11 @@ platform = Ios
 else ifeq ($(ios-x86), 1)
 platform = IosSim
 else
-platform = Mac
+ifeq ($(mac-64),1)
+platform = Mac-x64
+else
+platform = Mac-x86
+endif
 endif
 else
 platform = Posix
