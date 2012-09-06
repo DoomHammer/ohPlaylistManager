@@ -31,10 +31,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="ohNet.net">
-      <HintPath>..\..\ohNet\Build\Obj\Mac\Release\ohNet.net.dll</HintPath>
+      <HintPath>..\..\ohNet\Build\Obj\Mac-x86\Release\ohNet.net.dll</HintPath>
     </Reference>
     <Reference Include="ohXen">
-      <HintPath>..\..\ohXen\Build\Obj\Mac\Release\ohXen.dll</HintPath>
+      <HintPath>..\..\ohXen\Build\Obj\Mac-x86\Release\ohXen.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -44,7 +44,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="..\..\ohNet\Build\Obj\Mac\Release\libohNet.dylib">
+    <None Include="..\..\ohNet\Build\Obj\Mac-x86\Release\libohNet.dylib">
       <Link>libohNet.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

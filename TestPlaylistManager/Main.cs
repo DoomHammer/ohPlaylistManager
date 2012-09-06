@@ -27,7 +27,7 @@ namespace TestPlaylistManager
 
             string rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             IconResourceManager rm = new IconResourceManager(rootPath);
-            PlaylistManager pm = new PlaylistManager(adapter, rootPath, Environment.MachineName, "OpenHome", "http://www.openhome.org", "PlaylistManager", "http://www.openhome.org", rm, "Icon.png");
+            PlaylistManager pm = new PlaylistManager(adapter, rootPath, Environment.MachineName, "OpenHome", "http://www.openhome.org", "TestPlaylistManager", "http://www.openhome.org", rm, "Icon.png", "image/png", 114, 114, 32);
             adapter.RemoveRef("PlaylistManager");
             pm.Start();
 

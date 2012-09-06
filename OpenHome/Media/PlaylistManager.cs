@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Xml;
 
 using OpenHome.Net.Core;
 using OpenHome.Net.Device;
@@ -9,7 +10,7 @@ namespace OpenHome.Media
 {
     public class PlaylistManager : IDisposable
     {
-        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModel, string aModelUrl, IResourceManager aResourceManager, string aIconUri)
+        public PlaylistManager(NetworkAdapter aAdapter, string aRootPath, string aMachineName, string aManufacturer, string aManufacturerUrl, string aModel, string aModelUrl, IResourceManager aResourceManager, string aIconUri, string aIconMimeType, uint aIconWidth, uint aIconHeight, uint aIconDepth)
         {
             string upnpname = string.Format("{0} {1} PlaylistManager ({2})", aManufacturer, aModel, aMachineName);
             // no need to include PlaylistManager in metadata as a user will protentially not be aware that they are running a playlist manager
@@ -32,6 +33,29 @@ namespace OpenHome.Media
             iDevice.SetAttribute("Upnp.ModelUrl", aModelUrl);
             iDevice.SetAttribute("Upnp.SerialNumber", "");
             iDevice.SetAttribute("Upnp.Upc", "");
+
+            if (!string.IsNullOrEmpty(aIconUri))
+            {
+                XmlDocument result = new XmlDocument();
+                var icon = result.CreateElement("icon");
+                result.AppendChild(icon);
+                var mimetype = result.CreateElement("mimetype");
+                mimetype.InnerText = aIconMimeType;
+                icon.AppendChild(mimetype);
+                var width = result.CreateElement("width");
+                width.InnerText = aIconWidth.ToString();
+                icon.AppendChild(width);
+                var height = result.CreateElement("height");
+                height.InnerText = aIconHeight.ToString();
+                icon.AppendChild(height);
+                var depth = result.CreateElement("depth");
+                depth.InnerText = aIconDepth.ToString();
+                icon.AppendChild(depth);
+                var url = result.CreateElement("url");
+                url.InnerText = string.Format("/{0}/resource/{1}", udn, aIconUri);
+                icon.AppendChild(url);
+                iDevice.SetAttribute("Upnp.IconList", result.OuterXml);
+            }
 
             iControlPoint = new CpDeviceListUpnpServiceType("upnp.org", "ContentDirectory", 1, Added, Removed);
 
