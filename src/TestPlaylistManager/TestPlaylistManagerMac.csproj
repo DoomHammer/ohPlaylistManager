@@ -34,7 +34,7 @@
       <HintPath>..\..\dependencies\AnyPlatform\ohNet\lib\ohNet.net.dll</HintPath>
     </Reference>
     <Reference Include="ohXen">
-      <HintPath>..\..\dependencies\ohXen\ohXen.dll</HintPath>
+      <HintPath>..\..\dependencies\AnyPlatform\ohXen\ohXen.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
