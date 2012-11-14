@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ohPlaylistManagerWindows", "ohPlaylistManagerWindows.csproj", "{876E014E-8B73-40C3-A48C-368CFE1EE2C1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ohPlaylistManager", "ohPlaylistManager\ohPlaylistManager.csproj", "{876E014E-8B73-40C3-A48C-368CFE1EE2C1}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestPlaylistManagerWindows", "TestPlaylistManager\TestPlaylistManagerWindows.csproj", "{52E71CF3-BDC5-48D0-B22B-35AEBB42B03E}"
 EndProject

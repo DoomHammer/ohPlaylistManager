@@ -32,11 +32,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ohXen">
-      <HintPath>..\..\ohXen\Build\Obj\Windows\Release\ohXen.dll</HintPath>
+      <HintPath>..\..\dependencies\AnyPlatform\ohXen\ohXen.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="ohNet.net">
-      <HintPath>..\..\ohNet\Build\Obj\Windows\Release\ohNet.net.dll</HintPath>
+      <HintPath>..\..\dependencies\AnyPlatform\ohNet\lib\ohNet.net.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -46,7 +46,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="..\..\ohNet\Build\Obj\Windows\Release\ohNet.dll">
+    <None Include="..\..\dependencies\Windows-x86\ohNet\lib\ohNet.dll">
       <Link>ohNet.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -58,7 +58,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ohPlaylistManagerWindows.csproj">
+    <ProjectReference Include="..\ohPlaylistManager\ohPlaylistManager.csproj">
       <Project>{876E014E-8B73-40C3-A48C-368CFE1EE2C1}</Project>
       <Name>ohPlaylistManagerWindows</Name>
     </ProjectReference>

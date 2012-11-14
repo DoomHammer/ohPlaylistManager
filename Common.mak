@@ -1,12 +1,12 @@
 all : $(objdir)/ohPlaylistManager.dll
 
 source = Properties$(dirsep)AssemblyInfo.cs \
-OpenHome$(dirsep)Media$(dirsep)BigEndianConverter.cs \
-OpenHome$(dirsep)Media$(dirsep)Playlist.cs \
-OpenHome$(dirsep)Media$(dirsep)PlaylistManager.cs \
-OpenHome$(dirsep)Media$(dirsep)PlaylistManagerEngine.cs \
-OpenHome$(dirsep)Media$(dirsep)ProviderPlaylistManager.cs \
-OpenHome$(dirsep)Media$(dirsep)ResourceManager.cs \
+src$(dirsep)ohPlaylistManager$(dirsep)BigEndianConverter.cs \
+src$(dirsep)ohPlaylistManager$(dirsep)Playlist.cs \
+src$(dirsep)ohPlaylistManager$(dirsep)PlaylistManager.cs \
+src$(dirsep)ohPlaylistManager$(dirsep)PlaylistManagerEngine.cs \
+src$(dirsep)ohPlaylistManager$(dirsep)ProviderPlaylistManager.cs \
+src$(dirsep)ohPlaylistManager$(dirsep)ResourceManager.cs \
 
 $(objdir)/ohPlaylistManager.dll : $(objdir) $(source)
 	$(csharp) /target:library \

@@ -7,3 +7,5 @@
 bin/
 obj/
 /Build/
+/build/
+/dependencies/

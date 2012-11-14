@@ -1,0 +1,35 @@
+[
+    {   "name": "ohNet",
+        "type": "openhome",
+        "platform-specific": true,
+        "version": "1.0.433",
+        "archive-suffix": "-dev-release",
+        "dest": "dependencies/${platform}/ohNet",
+        "strip-archive-dirs":1
+    },
+	{   "name": "ohNet-AnyPlatform",
+        "type": "openhome",
+        "platform-specific": true,
+        "version": "1.0.433",
+        "archive-suffix": "-dev-release",
+		"archive-directory": "${binary-repo}/ohNet/",
+        "archive-filename": "${archive-prefix}ohNet-${version}-${archive-platform}${archive-suffix}${archive-extension}",
+        "dest": "dependencies/AnyPlatform/ohNet",
+        "strip-archive-dirs":1
+    },
+    {   "name": "NuGet",
+        "type": "external",
+        "version": "1.7.30402.9028",
+        "platform-specific": false,
+        "archive-filename": "${name}.${version}.tar.gz",
+        "configure-args": []
+    },
+    {   "name": "ohXen",
+        "type": "openhome",
+        "version": "latest",
+        "platform-specific": true,
+        "archive-path": "../ohXen/build/packages/ohXen-${platform}-${titlecase-debugmode}.tar.gz",
+        "dest": "dependencies/AnyPlatform/ohXen",
+        "strip-archive-dirs":1
+    }
+]

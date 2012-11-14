@@ -31,10 +31,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="ohNet.net">
-      <HintPath>..\..\ohNet\Build\Obj\Mac-x86\Release\ohNet.net.dll</HintPath>
+      <HintPath>..\..\dependencies\AnyPlatform\ohNet\lib\ohNet.net.dll</HintPath>
     </Reference>
     <Reference Include="ohXen">
-      <HintPath>..\..\ohXen\Build\Obj\Mac-x86\Release\ohXen.dll</HintPath>
+      <HintPath>..\..\dependencies\ohXen\ohXen.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -42,9 +42,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IconResourceManager.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="..\..\ohNet\Build\Obj\Mac-x86\Release\libohNet.dylib">
+    <None Include="..\..\dependencies\Mac-x86\ohNet\lib\libohNet.dylib">
       <Link>libohNet.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -56,9 +55,19 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ohPlaylistManagerMac.csproj">
+    <ProjectReference Include="..\ohPlaylistManager\ohPlaylistManager.csproj">
       <Project>{876E014E-8B73-40C3-A48C-368CFE1EE2C1}</Project>
-      <Name>ohPlaylistManagerMac</Name>
+      <Name>ohPlaylistManager</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\SharedSettings.targets" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PackageName>ohPlaylistManager-AnyPlatform-$(Configuration)</PackageName>
+    <PackageFilePatterns>ohPlaylistManager.dll ohPlaylistManager.*db</PackageFilePatterns>
+  </PropertyGroup>
+  <Target Name="AfterBuild">
+    <MakeDir Directories="$(PackageOutputPath)" />
+    <Exec Command="..\..\go make_binball -b $(OutputPath) -p $(PackageName)/ $(PackageOutputPath)/$(PackageName).tar.gz $(PackageFilePatterns)" />
+  </Target>
 </Project>
