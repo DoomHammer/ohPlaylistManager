@@ -1,6 +1,6 @@
 all : $(objdir)/ohPlaylistManager.dll
 
-source = Properties$(dirsep)AssemblyInfo.cs \
+source = src$(dirsep)ohPlaylistManager$(dirsep)Properties$(dirsep)AssemblyInfo.cs \
 src$(dirsep)ohPlaylistManager$(dirsep)BigEndianConverter.cs \
 src$(dirsep)ohPlaylistManager$(dirsep)Playlist.cs \
 src$(dirsep)ohPlaylistManager$(dirsep)PlaylistManager.cs \
